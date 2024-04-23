@@ -74,9 +74,13 @@
       <v-col>
         <v-sheet class="mx-auto" flat>
           <div class="d-flex align-start overflow-auto">
-            <div v-for="slide in slideGroups" :key="slide.name" class="mx-2">
+            <div
+              v-for="section in sectionGroups"
+              :key="section.name"
+              class="mx-2"
+            >
               <div class="d-flex align-center justify-space-between py-2">
-                <span class="subtitle-2 ml-1">{{ slide.name }}</span>
+                <span class="subtitle-2 ml-1">{{ section.name }}</span>
                 <span>
                   <v-menu
                     v-model="menu"
@@ -189,13 +193,13 @@
                 <v-card-text class="pa-3">
                   <draggable
                     data-source="tasks"
-                    :list="slide.list"
+                    :list="section.list"
                     class="list-group"
                     draggable=".item"
                     group="a"
                   >
                     <div
-                      v-for="element in slide.list"
+                      v-for="element in section.list"
                       :key="element.name"
                       class="item mb-2"
                     >
@@ -294,9 +298,62 @@
                 </v-card-text>
               </v-card>
             </div>
-            <button class="caption font-weight-bold mt-2 ml-4">
-              <v-icon color="green" small>mdi-plus</v-icon>Add Section
-            </button>
+
+            <v-menu
+              v-model="sectionMenu"
+              :close-on-content-click="false"
+              :close-on-click="false"
+              :nudge-width="200"
+              offset-x
+              :min-width="250"
+              :max-width="250"
+            >
+              <template #activator="{ on, attrs }">
+                <button
+                  class="caption font-weight-bold mt-2 ml-4"
+                  v-bind="attrs"
+                  v-on="on"
+                >
+                  <v-icon color="green" small>mdi-plus</v-icon>Add Section
+                </button>
+              </template>
+              <v-form ref="form" v-model="validSection" lazy-validation>
+                <v-card>
+                  <v-card-title class="pb-0">
+                    <span class="subtitle-2">Create Section</span>
+                  </v-card-title>
+                  <v-card-text class="pr-2 mt-3 mb-0 pb-0">
+                    <v-text-field
+                      v-model="sectionTitle"
+                      placeholder="Create a title"
+                      hide-details
+                      dense
+                      outlined
+                      class="mr-2 caption rounded-lg mb-2"
+                      :rules="nameRules"
+                    ></v-text-field>
+                  </v-card-text>
+
+                  <v-card-actions class="grey lighten-4 my-0">
+                    <v-spacer></v-spacer>
+
+                    <v-btn text color="error" small @click="closeSectionMenu">
+                      Cancel
+                    </v-btn>
+                    <v-btn
+                      color="success"
+                      text
+                      small
+                      class="mr-3"
+                      :disabled="!validSection"
+                      @click="validate"
+                    >
+                      Save
+                    </v-btn>
+                  </v-card-actions>
+                </v-card>
+              </v-form>
+            </v-menu>
           </div>
         </v-sheet>
       </v-col>
@@ -310,40 +367,62 @@ export default {
     draggable,
   },
   data: () => ({
-    model: null,
     menu: null,
-    slideGroups: [
-      {
-        name: 'To do',
-        list: [
-          { name: 'A 1', id: 0 },
-          { name: 'A 2', id: 1 },
-          { name: 'A 3', id: 2 },
-        ],
-      },
-      {
-        name: 'In Progress',
-        list: [
-          { name: 'B 1', id: 0 },
-          { name: 'B 2', id: 1 },
-          { name: 'B 3', id: 2 },
-        ],
-      },
-      {
-        name: 'Done',
-        list: [
-          { name: 'C 1', id: 0 },
-          { name: 'C 2', id: 1 },
-          { name: 'C 3', id: 2 },
-        ],
-      },
+    nameRules: [(v) => !!v || 'Field is required'],
+    validSection: true,
+    sectionMenu: false,
+    sectionTitle: '',
+    sectionGroups: [
+      // {
+      //   name: 'To do',
+      //   list: [
+      //     { name: 'A 1', id: 0 },
+      //     { name: 'A 2', id: 1 },
+      //     { name: 'A 3', id: 2 },
+      //   ],
+      // },
+      // {
+      //   name: 'In Progress',
+      //   list: [
+      //     { name: 'B 1', id: 0 },
+      //     { name: 'B 2', id: 1 },
+      //     { name: 'B 3', id: 2 },
+      //   ],
+      // },
+      // {
+      //   name: 'Done',
+      //   list: [
+      //     { name: 'C 1', id: 0 },
+      //     { name: 'C 2', id: 1 },
+      //     { name: 'C 3', id: 2 },
+      //   ],
+      // },
     ],
     horizontalDotsMenuLists: [
       { title: 'Edit', icon: 'mdi-pencil' },
       { title: 'Delete', icon: 'mdi-delete' },
     ],
   }),
-  methods: {},
+  methods: {
+    async validate() {
+      try {
+        if (this.$refs.form.validate()) {
+          const payload = {
+            title: this.sectionTitle,
+          }
+          const response = await this.$axios.$post('/api/section/add', payload)
+          if (response.status === 200) {
+            console.log(response)
+          }
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    closeSectionMenu() {
+      this.sectionMenu = false
+    },
+  },
 }
 </script>
 <style scoped>
