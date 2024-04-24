@@ -22,6 +22,22 @@ const postSection = async (req, res) => {
     res.status(400).json(createResponse("Error", 400, err.message));
   }
 };
+const postBulkSection = async (req, res) => {
+  const defaultSections = req.body; // Assuming req.body is an array of parent documents
+
+  try {
+    // Insert the section documents into the database
+    const insertedSections = await Section.insertMany(defaultSections);
+    res
+      .status(201)
+      .json(
+        createResponse("Sections inserted successfully", 201, insertedSections)
+      );
+  } catch (error) {
+    console.error("Error inserting parents:", error);
+    res.status(500).json(createResponse("Error", 500, error.message));
+  }
+};
 const updateSection = async (req, res) => {
   try {
     const updatedSection = await Section.findByIdAndUpdate(
@@ -59,4 +75,10 @@ const deleteSection = async (req, res) => {
     res.status(500).json(createResponse("Error", 500, err.message));
   }
 };
-module.exports = { getSection, postSection, updateSection, deleteSection };
+module.exports = {
+  getSection,
+  postSection,
+  postBulkSection,
+  updateSection,
+  deleteSection,
+};

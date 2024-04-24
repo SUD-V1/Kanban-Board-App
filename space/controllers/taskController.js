@@ -1,3 +1,5 @@
+const mongoose = require("mongoose");
+
 const Section = require("../models/sectionModel");
 const Task = require("../models/taskModel");
 const createResponse = require("../helpers/taskHelper");
@@ -26,6 +28,43 @@ const postTask = async (req, res) => {
       .json(createResponse("Task created successfully", 201, newTask));
   } catch (err) {
     res.status(400).json(createResponse("Error", 400, err.message));
+  }
+};
+const postBulkTask = async (req, res) => {
+  const { sectionId } = req.params;
+  const tasks = req.body;
+
+  try {
+    // Validate parent ID
+    if (!mongoose.Types.ObjectId.isValid(sectionId)) {
+      return res
+        .status(400)
+        .json(createResponse("Error", 404, "Invalid parent ID"));
+    }
+
+    // Check if parent exists
+    const section = await Section.findById(sectionId);
+    if (!section) {
+      return res
+        .status(404)
+        .json(createResponse("Error", 404, "Section not found"));
+    }
+    console.log(tasks, "tAjj");
+    // Insert many child documents
+    const insertedtasks = await Task.insertMany(tasks);
+
+    // Associate inserted children with parent
+    section.list.push(...insertedtasks.map((task) => task._id));
+    await section.save();
+
+    res
+      .status(201)
+      .json(createResponse("Tasks inserted successfully", 201, section.list));
+  } catch (error) {
+    console.error("Error inserting children:", error);
+    res
+      .status(500)
+      .json(createResponse("Internal server error", 500, error.message));
   }
 };
 const updateTask = async (req, res) => {
@@ -73,4 +112,4 @@ const deleteTask = async (req, res) => {
     res.status(500).json(createResponse("Error", 500, err.message));
   }
 };
-module.exports = { postTask, updateTask, deleteTask };
+module.exports = { postTask, postBulkTask, updateTask, deleteTask };

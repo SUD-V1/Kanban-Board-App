@@ -233,7 +233,12 @@
                         >
                           <div>
                             <v-avatar color="grey" size="27" class="mx-2">
-                              <img :src="task.assignee" alt="" />
+                              <img
+                                v-if="task?.assignee"
+                                :src="task.assignee"
+                                alt=""
+                              />
+                              <v-icon v-else>mdi-account</v-icon>
                             </v-avatar>
                             <span class="caption black--text">{{
                               task.date
@@ -423,11 +428,137 @@ export default {
       { name: 'John Smith', group: 'Group 2', avatar: srcs[1] },
       { name: 'Sandra Williams', group: 'Group 2', avatar: srcs[3] },
     ],
+    defaultSectionsLists: [
+      {
+        name: 'To do',
+        list: [
+          // {
+          //   name: 'Kanban Board',
+          //   description:
+          //     'A Kanban board is a visual tool used to manage and visualize work.',
+          //   assignee: srcs[1],
+          //   subtitle: 'Design',
+          //   date: '2024-04-24',
+          // },
+        ],
+      },
+      {
+        name: 'In Progress',
+        list: [
+          // {
+          //   name: 'Kanban Integration',
+          //   description:
+          //     'A Kanban board is a visual tool used to manage and visualize work.',
+          //   assignee: srcs[2],
+          //   subtitle: 'Integration',
+          //   date: '2024-04-24',
+          // },
+          // {
+          //   name: 'Kanban Integration',
+          //   description:
+          //     'A Kanban board is a visual tool used to manage and visualize work.',
+          //   assignee: srcs[3],
+          //   subtitle: 'Integration',
+          //   date: '2024-04-24',
+          // },
+          // {
+          //   name: 'Kanban Integration',
+          //   description:
+          //     'A Kanban board is a visual tool used to manage and visualize work.',
+          //   assignee: srcs[4],
+          //   subtitle: 'Integration',
+          //   date: '2024-04-24',
+          // },
+        ],
+      },
+      {
+        name: 'Done',
+        list: [
+          // {
+          //   name: 'Kanban Board Dialogs',
+          //   description:
+          //     'A Kanban board is a visual tool used to manage and visualize work.',
+          //   assignee: srcs[5],
+          //   subtitle: 'Design',
+          //   date: '2024-04-24',
+          // },
+        ],
+      },
+    ],
   }),
   created() {
     this.getAllSections()
   },
   methods: {
+    // Inserting Default Sections
+    async defaultSections() {
+      if (this.sectionGroups?.length === 0) {
+        try {
+          const payload = [...this.defaultSectionsLists]
+          const response = await this.$axios.$post(
+            '/sections/bulk-insert',
+            payload
+          )
+          if (response.status === 200 || response.status === 201) {
+            console.log(response, 'opop')
+            response?.data?.forEach((section) => {
+            this.defaultSectionTasks(section._id)
+            })
+            this.getAllSections()
+          }
+        } catch (error) {
+          console.log(error)
+          this.createSectionDialog = false
+        }
+      }
+    },
+    async defaultSectionTasks(id) {
+      try {
+        const payload = [
+          {
+            name: 'Kanban Integration',
+            description:
+              'A Kanban board is a visual tool used to manage and visualize work.',
+            assignee: srcs[2],
+            subtitle: 'Integration',
+            date: '2024-04-24',
+          },
+          {
+            name: 'Kanban Integration',
+            description:
+              'A Kanban board is a visual tool used to manage and visualize work.',
+            assignee: srcs[2],
+            subtitle: 'Integration',
+            date: '2024-04-24',
+          },
+          {
+            name: 'Kanban Integration',
+            description:
+              'A Kanban board is a visual tool used to manage and visualize work.',
+            assignee: srcs[2],
+            subtitle: 'Integration',
+            date: '2024-04-24',
+          },
+          {
+            name: 'Kanban Integration',
+            description:
+              'A Kanban board is a visual tool used to manage and visualize work.',
+            assignee: srcs[2],
+            subtitle: 'Integration',
+            date: '2024-04-24',
+          },
+        ]
+        const response = await this.$axios.$post(
+          `/sections/${id}/bulk-insert`,
+          payload
+        )
+        if (response.status === 200 || response.status === 201) {
+          this.getAllSections()
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    },
     // Section CRUD API Integration
     // POST API
     async createSection(value) {
@@ -512,6 +643,9 @@ export default {
         const response = await this.$axios.$get('/sections')
         if (response.status === 200) {
           console.log(response)
+          if (!response?.data?.length) {
+            await this.defaultSections()
+          }
           this.sectionGroups = [...response?.data]
         }
       } catch (error) {
