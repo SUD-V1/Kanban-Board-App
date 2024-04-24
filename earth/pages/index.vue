@@ -75,17 +75,17 @@
         <v-sheet class="mx-auto" flat>
           <div class="d-flex align-start overflow-auto">
             <div
-              v-for="section in sectionGroups"
-              :key="section.name"
+              v-for="(section, sectionIndex) in sectionGroups"
+              :key="section._id"
               class="mx-2"
             >
               <div class="d-flex align-center justify-space-between py-2">
                 <span class="subtitle-2 ml-1">{{ section.name }}</span>
                 <span>
                   <v-menu
-                    v-model="menu"
+                    :ref="`taskMenu${sectionIndex}`"
                     :close-on-content-click="false"
-                    :close-on-click="false"
+                    :close-on-click="true"
                     :nudge-width="200"
                     offset-x
                     :min-width="350"
@@ -138,7 +138,7 @@
                     </v-card>
                   </v-menu>
                   <v-menu
-                    v-model="menu"
+                    :ref="`menu${sectionIndex}`"
                     :close-on-content-click="false"
                     :nudge-width="200"
                     offset-x
@@ -157,6 +157,9 @@
                           v-for="(item, i) in horizontalDotsMenuLists"
                           :key="i"
                           class="cursor-pointer py-0"
+                          @click="
+                            updateSectionList(item, sectionIndex, section)
+                          "
                         >
                           <v-list-item-content>
                             <v-list-item-title class="d-flex align-center">
@@ -197,18 +200,19 @@
                     class="list-group"
                     draggable=".item"
                     group="a"
+                    @change="getData"
                   >
                     <div
-                      v-for="element in section.list"
-                      :key="element.name"
+                      v-for="(task, taskIndex) in section.list"
+                      :key="task._id"
                       class="item mb-2"
                     >
                       <v-card class="rounded-xl" flat outlined>
                         <v-card-title class="pt-2 pb-2">
-                          <span class="subtitle-2">Title</span>
+                          <span class="subtitle-2">{{ task.name }}</span>
                           <v-spacer></v-spacer>
                           <v-menu
-                            v-model="menu"
+                            :ref="`menuTask${taskIndex}`"
                             :close-on-content-click="false"
                             :nudge-width="200"
                             offset-x
@@ -232,6 +236,7 @@
                                   v-for="(item, i) in horizontalDotsMenuLists"
                                   :key="i"
                                   class="cursor-pointer py-0"
+                                  @click="updateTaskList(item, section, task)"
                                 >
                                   <v-list-item-content>
                                     <v-list-item-title
@@ -261,11 +266,7 @@
                         <v-card-text
                           class="caption font-weight-medium card-content pr-2"
                         >
-                          Lorem ipsum dolor sit amet can adipisicing elit. Rem
-                          harum nisi accusamus, recusandae numquam beatae
-                          voluptas? Itaque esse ipsum deleniti fugiat reiciendis
-                          quas numquam odio, sunt exercitationem! Accusantium,
-                          laudantium fugit.
+                          {{ task.description }}
                         </v-card-text>
 
                         <v-card-actions
@@ -290,7 +291,10 @@
                       role="group"
                       aria-label="Basic example"
                     >
-                      <button class="caption font-weight-bold mt-2">
+                      <button
+                        class="caption font-weight-bold mt-2"
+                        @click="addSection(section)"
+                      >
                         <v-icon color="green" small>mdi-plus</v-icon>Add Task
                       </button>
                     </div>
@@ -298,66 +302,260 @@
                 </v-card-text>
               </v-card>
             </div>
-
-            <v-menu
-              v-model="sectionMenu"
-              :close-on-content-click="false"
-              :close-on-click="false"
-              :nudge-width="200"
-              offset-x
-              :min-width="250"
-              :max-width="250"
+            <button
+              class="caption font-weight-bold mt-2 ml-4"
+              @click="createSectionDialog = true"
             >
-              <template #activator="{ on, attrs }">
-                <button
-                  class="caption font-weight-bold mt-2 ml-4"
-                  v-bind="attrs"
-                  v-on="on"
-                >
-                  <v-icon color="green" small>mdi-plus</v-icon>Add Section
-                </button>
-              </template>
-              <v-form ref="form" v-model="validSection" lazy-validation>
-                <v-card>
-                  <v-card-title class="pb-0">
-                    <span class="subtitle-2">Create Section</span>
-                  </v-card-title>
-                  <v-card-text class="pr-2 mt-3 mb-0 pb-0">
-                    <v-text-field
-                      v-model="sectionTitle"
-                      placeholder="Create a title"
-                      hide-details
-                      dense
-                      outlined
-                      class="mr-2 caption rounded-lg mb-2"
-                      :rules="nameRules"
-                    ></v-text-field>
-                  </v-card-text>
-
-                  <v-card-actions class="grey lighten-4 my-0">
-                    <v-spacer></v-spacer>
-
-                    <v-btn text color="error" small @click="closeSectionMenu">
-                      Cancel
-                    </v-btn>
-                    <v-btn
-                      color="success"
-                      text
-                      small
-                      class="mr-3"
-                      :disabled="!validSection"
-                      @click="validate"
-                    >
-                      Save
-                    </v-btn>
-                  </v-card-actions>
-                </v-card>
-              </v-form>
-            </v-menu>
+              <v-icon color="green" small>mdi-plus</v-icon>Add Section
+            </button>
           </div>
         </v-sheet>
       </v-col>
     </v-row>
+    <v-dialog v-model="createSectionDialog" persistent max-width="290">
+      <v-form ref="form" v-model="validSection" lazy-validation>
+        <v-card>
+          <v-card-title class="pb-0">
+            <span class="subtitle-2">Create Section</span>
+          </v-card-title>
+          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
+            <v-text-field
+              v-model="sectionTitle"
+              placeholder="Create a title"
+              hide-details
+              dense
+              outlined
+              class="mr-2 caption rounded-lg mb-2"
+              :rules="nameRules"
+            ></v-text-field>
+          </v-card-text>
+
+          <v-card-actions class="grey lighten-4 my-0">
+            <v-spacer></v-spacer>
+
+            <v-btn text color="error" small @click="closeSectionDialog">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="success"
+              text
+              small
+              class="mr-3"
+              :disabled="!validSection"
+              @click="createSection"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
+    <v-dialog v-model="updateSectionDialog" persistent max-width="290">
+      <v-form ref="form" v-model="validSection" lazy-validation>
+        <v-card>
+          <v-card-title class="pb-0">
+            <span class="subtitle-2">Update Section</span>
+          </v-card-title>
+          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
+            <v-text-field
+              v-model="sectionTitle"
+              placeholder="Create a title"
+              hide-details
+              dense
+              outlined
+              class="mr-2 caption rounded-lg mb-2"
+              :rules="nameRules"
+            ></v-text-field>
+          </v-card-text>
+
+          <v-card-actions class="grey lighten-4 my-0">
+            <v-spacer></v-spacer>
+
+            <v-btn text color="error" small @click="closeSectionDialog">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="success"
+              text
+              small
+              class="mr-3"
+              :disabled="!validSection"
+              @click="updateSection"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
+    <v-dialog v-model="deleteSectionDialog" persistent max-width="290">
+      <v-card>
+        <v-card-title class="pb-0">
+          <span class="subtitle-2">Delete Section</span>
+        </v-card-title>
+        <v-card-title>
+          <span class="caption text-center"
+            ><v-icon color="yellow darken-2" class="mr-2"
+              >mdi-alert-circle-outline</v-icon
+            >Are you sure you want to delete this
+            <b class="black--text">Section?</b></span
+          >
+        </v-card-title>
+
+        <v-card-actions class="grey lighten-4 my-0">
+          <v-spacer></v-spacer>
+
+          <v-btn text color="grey" small @click="closeDeleteSectionDialog">
+            Cancel
+          </v-btn>
+          <v-btn color="error" text small class="mr-3" @click="deleteSection">
+            delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="createTaskDialog" persistent max-width="290">
+      <v-form ref="form" v-model="validSection" lazy-validation>
+        <v-card>
+          <v-card-title class="pb-0">
+            <span class="subtitle-2">Create Task</span>
+          </v-card-title>
+          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
+            <v-text-field
+              v-model="taskName"
+              placeholder="Create a title"
+              hide-details
+              dense
+              outlined
+              class="mr-2 caption rounded-lg mb-2"
+              :rules="nameRules"
+            ></v-text-field>
+            <v-textarea
+              v-model="taskDescription"
+              hide-details
+              dense
+              outlined
+              rows="3"
+              placeholder="Description"
+              class="mr-2 caption rounded-lg my-2"
+              :rules="nameRules"
+            ></v-textarea>
+            <!-- <v-file-input
+                                v-model="taskImage"
+                                accept="image/png, image/jpeg, image/bmp"
+                                placeholder="Select a photo"
+                                outlined
+                                dense
+                                hide-details
+                                class="mr-2 caption rounded-lg my-2"
+                                :rules="rules"
+                              ></v-file-input> -->
+          </v-card-text>
+
+          <v-card-actions class="grey lighten-4 my-0">
+            <v-spacer></v-spacer>
+
+            <v-btn text color="error" small @click="closeTaskDialog">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="success"
+              text
+              small
+              class="mr-3"
+              :disabled="!validTask"
+              @click="createTask"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
+    <v-dialog v-model="updateTaskDialog" persistent max-width="290">
+      <v-form ref="form" v-model="validSection" lazy-validation>
+        <v-card>
+          <v-card-title class="pb-0">
+            <span class="subtitle-2">Create Task</span>
+          </v-card-title>
+          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
+            <v-text-field
+              v-model="taskName"
+              placeholder="Create a title"
+              hide-details
+              dense
+              outlined
+              class="mr-2 caption rounded-lg mb-2"
+              :rules="nameRules"
+            ></v-text-field>
+            <v-textarea
+              v-model="taskDescription"
+              hide-details
+              dense
+              outlined
+              rows="3"
+              placeholder="Description"
+              class="mr-2 caption rounded-lg my-2"
+              :rules="nameRules"
+            ></v-textarea>
+            <!-- <v-file-input
+                                v-model="taskImage"
+                                accept="image/png, image/jpeg, image/bmp"
+                                placeholder="Select a photo"
+                                outlined
+                                dense
+                                hide-details
+                                class="mr-2 caption rounded-lg my-2"
+                                :rules="rules"
+                              ></v-file-input> -->
+          </v-card-text>
+
+          <v-card-actions class="grey lighten-4 my-0">
+            <v-spacer></v-spacer>
+
+            <v-btn text color="error" small @click="closeTaskDialog">
+              Cancel
+            </v-btn>
+            <v-btn
+              color="success"
+              text
+              small
+              class="mr-3"
+              :disabled="!validTask"
+              @click="updateTask"
+            >
+              Save
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-form>
+    </v-dialog>
+    <v-dialog v-model="deleteTaskDialog" persistent max-width="290">
+      <v-card>
+        <v-card-title class="pb-0">
+          <span class="subtitle-2">Delete Task</span>
+        </v-card-title>
+        <v-card-title>
+          <span class="caption text-center"
+            ><v-icon color="yellow darken-2" class="mr-2"
+              >mdi-alert-circle-outline</v-icon
+            >Are you sure you want to delete this
+            <b class="black--text">Task?</b></span
+          >
+        </v-card-title>
+
+        <v-card-actions class="grey lighten-4 my-0">
+          <v-spacer></v-spacer>
+
+          <v-btn text color="grey" small @click="closeDeleteTaskDialog">
+            Cancel
+          </v-btn>
+          <v-btn color="error" text small class="mr-3" @click="deleteTask">
+            delete
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <script>
@@ -370,8 +568,12 @@ export default {
     menu: null,
     nameRules: [(v) => !!v || 'Field is required'],
     validSection: true,
-    sectionMenu: false,
     sectionTitle: '',
+    sectionId: '',
+    addSectionMenu: false,
+    createSectionDialog: false,
+    updateSectionDialog: false,
+    deleteSectionDialog: false,
     sectionGroups: [
       // {
       //   name: 'To do',
@@ -398,30 +600,242 @@ export default {
       //   ],
       // },
     ],
+    validTask: true,
+    taskName: '',
+    taskDescription: '',
+    taskImage: '',
+    rules: [
+      (value) =>
+        !value ||
+        value.size < 2000000 ||
+        'Avatar size should be less than 2 MB!',
+    ],
+    createTaskDialog: false,
+    updateTaskDialog: false,
+    deleteTaskDialog: false,
     horizontalDotsMenuLists: [
       { title: 'Edit', icon: 'mdi-pencil' },
       { title: 'Delete', icon: 'mdi-delete' },
     ],
   }),
+  created() {
+    this.getAllSections()
+  },
   methods: {
-    async validate() {
+    async createSection() {
       try {
         if (this.$refs.form.validate()) {
           const payload = {
-            title: this.sectionTitle,
+            name: this.sectionTitle,
           }
-          const response = await this.$axios.$post('/api/section/add', payload)
+          const response = await this.$axios.$post('/sections', payload)
+          if (response.status === 200 || response.status === 201) {
+            this.getAllSections()
+            this.createSectionDialog = false
+            this.sectionTitle = ''
+          }
+        }
+      } catch (error) {
+        console.log(error)
+        this.createSectionDialog = false
+        this.sectionTitle = ''
+      }
+    },
+    updateSectionList(item, sectionIndex, section) {
+      this.sectionId = section?._id
+      if (item.title === 'Edit') {
+        this.updateSectionDialog = true
+        this.sectionTitle = section?.name
+      } else {
+        this.updateSectionDialog = false
+        this.deleteSectionDialog = true
+        this.sectionTitle = ''
+      }
+    },
+    async updateSection() {
+      try {
+        if (this.$refs.form.validate()) {
+          const payload = {
+            name: this.sectionTitle,
+          }
+          const response = await this.$axios.$put(
+            `/sections/${this.sectionId}`,
+            payload
+          )
           if (response.status === 200) {
-            console.log(response)
+            this.getAllSections()
+            this.updateSectionDialog = false
+            this.sectionTitle = ''
+            this.sectionId = ''
           }
+        }
+      } catch (error) {
+        console.log(error)
+        this.updateSectionDialog = false
+        this.sectionTitle = ''
+        this.sectionId = ''
+      }
+    },
+    async deleteSection() {
+      try {
+        const response = await this.$axios.$delete(
+          `/sections/${this.sectionId}`
+        )
+        if (response.status === 200) {
+          this.getAllSections()
+          this.updateSectionDialog = false
+          this.deleteSectionDialog = false
+          this.sectionTitle = ''
+          this.sectionId = ''
+        }
+      } catch (error) {
+        console.log(error)
+        this.updateSectionDialog = false
+        this.deleteSectionDialog = false
+        this.sectionTitle = ''
+        this.sectionId = ''
+      }
+    },
+    async getAllSections() {
+      try {
+        const response = await this.$axios.$get('/sections')
+        if (response.status === 200) {
+          console.log(response)
+          this.sectionGroups = [...response?.data]
         }
       } catch (error) {
         console.log(error)
       }
     },
-    closeSectionMenu() {
-      this.sectionMenu = false
+    closeSectionDialog() {
+      this.createSectionDialog = false
+      this.updateSectionDialog = false
     },
+    closeDeleteSectionDialog() {
+      this.deleteSectionDialog = false
+    },
+    closeTaskMenu() {},
+    addSection(section) {
+      this.sectionId = section._id
+      this.createTaskDialog = true
+    },
+    async createTask() {
+      try {
+        console.log(this.$refs)
+        // if (
+        //   this.$refs.formTask.validate() ||
+        //   this.$refs.formTask[sectionIndex].validate() ||
+        //   this.$refs.formTask[0].validate()
+        // ) {
+        const payload = {
+          name: this.taskName,
+          description: this.taskDescription,
+          taskImage: this.taskImage,
+        }
+        const response = await this.$axios.$post(
+          `/sections/${this.sectionId}/task`,
+          payload
+        )
+        if (response.status === 200 || response.status === 201) {
+          this.getAllSections()
+          this.createTaskDialog = false
+        }
+        // }
+      } catch (error) {
+        this.createTaskDialog = false
+        console.log(error)
+      }
+    },
+    updateTaskList(item, section, task) {
+      this.sectionId = section?._id
+      this.taskId = task._id
+      if (item.title === 'Edit') {
+        this.updateTaskDialog = true
+        this.taskName = task?.name
+        this.taskDescription = task?.description
+        this.taskImage = task?.image
+      } else {
+        this.updateTaskDialog = false
+        this.deleteTaskDialog = true
+        this.taskName = ''
+        this.taskDescription = ''
+        this.taskImage = ''
+      }
+    },
+    async updateTask() {
+      try {
+        if (this.$refs.form.validate()) {
+          const payload = {
+            name: this.taskName,
+            description: this.taskDescription,
+            image: this.taskImage,
+          }
+          const response = await this.$axios.$put(
+            `/sections/${this.sectionId}/task/${this.taskId}`,
+            payload
+          )
+          if (response.status === 200 || response.status === 201) {
+            this.getAllSections()
+            this.updateTaskDialog = false
+            this.sectionId = ''
+            this.taskName = ''
+            this.taskDescription = ''
+            this.taskImage = ''
+          }
+        }
+      } catch (error) {
+        console.log(error)
+        this.updateTaskDialog = false
+        this.sectionId = ''
+        this.taskName = ''
+        this.taskDescription = ''
+        this.taskImage = ''
+      }
+    },
+    async deleteTask() {
+      try {
+        const response = await this.$axios.$delete(
+          `/sections/${this.sectionId}/task/${this.taskId}`
+        )
+        if (response.status === 200) {
+          this.getAllSections()
+          this.updateTaskDialog = false
+          this.deleteTaskDialog = false
+          this.sectionId = ''
+          this.taskName = ''
+          this.taskDescription = ''
+          this.taskImage = ''
+        }
+      } catch (error) {
+        console.log(error)
+        this.updateTaskDialog = false
+        this.deleteTaskDialog = false
+        this.sectionId = ''
+        this.taskName = ''
+        this.taskDescription = ''
+        this.taskImage = ''
+      }
+    },
+    closeTaskDialog() {
+      console.log('hjh')
+      this.createTaskDialog = false
+      this.updateTaskDialog = false
+    },
+    closeDeleteTaskDialog() {
+      this.deleteTaskDialog = false
+    },
+    getData(event, parentId){
+      console.log(event, parentId)
+    },
+    // startDrag(value, old){
+    //   console.log(value, old)
+    // },
+    // dragComplete(value, old){
+    //   console.log(value, old)
+    // },
+    // checkMove(value){
+    //   console.log(value, "MOVE")
+    // }
   },
 }
 </script>
@@ -480,5 +894,12 @@ div::-webkit-scrollbar {
   background: rgb(239, 239, 239) !important;
   border-radius: 18px !important;
   color: black !important;
+}
+:deep(.v-dialog) {
+  box-shadow: none !important;
+  border-radius: 20px !important;
+}
+:deep(.v-icon--link::after) {
+  background-color: transparent !important;
 }
 </style>
