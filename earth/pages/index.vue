@@ -152,7 +152,11 @@
                     :list="section.list"
                     class="list-group"
                     draggable=".item"
-                    group="section"
+                    group="sections"
+                    :animation="200"
+                    :scroll-sensitivity="300"
+                    :force-fallback="true"
+                    @change="updatedSectionTaskList($event, section)"
                   >
                     <div
                       v-for="(task, taskIndex) in section.list"
@@ -236,7 +240,7 @@
                             }}</span>
                           </div>
                           <v-chip class="caption" small color="grey lighten-3">
-                            {{ task.subtitle }}
+                            {{ task.subtitle?.substring(0, 6) }}
                           </v-chip>
                         </v-card-actions>
                       </v-card>
@@ -260,6 +264,7 @@
               </v-card>
             </div>
             <button
+              v-if="sectionGroups?.length"
               class="caption font-weight-bold mt-2 ml-4"
               @click="createSectionDialog = true"
             >
@@ -267,6 +272,23 @@
             </button>
           </div>
         </v-sheet>
+      </v-col>
+    </v-row>
+    <v-row v-if="!sectionGroups?.length">
+      <v-col>
+        <div class="d-flex align-center justify-center flex-column">
+          <img
+            class="empty-state-svg-icon"
+            src="../assets/EmptyState.svg"
+            alt="EmptyState"
+          />
+          <button
+            class="caption font-weight-bold"
+            @click="createSectionDialog = true"
+          >
+            <v-icon color="green" small>mdi-plus</v-icon>Add Section
+          </button>
+        </div>
       </v-col>
     </v-row>
     <!-- Dialog -->
@@ -601,6 +623,37 @@ export default {
     closeDeleteTaskDialog() {
       this.deleteTaskDialog = false
     },
+    // Moving Task one section two another section
+    async updatedSectionTaskList(event, section) {
+      const task = await event?.added?.element
+      const sectionId = await section._id
+      if (event?.added) {
+        try {
+          const payload = { ...task }
+          const response = await this.$axios.$post(
+            `/sections/${sectionId}/task`,
+            payload
+          )
+          if (response.status === 200 || response.status === 201) {
+            this.getAllSections()
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      } else if (event?.removed) {
+        const task = await event?.removed?.element
+        try {
+          const response = await this.$axios.$delete(
+            `/sections/${sectionId}/task/${task?._id}`
+          )
+          if (response.status === 200) {
+            this.getAllSections()
+          }
+        } catch (error) {
+          console.log(error)
+        }
+      }
+    },
   },
 }
 </script>
@@ -647,5 +700,9 @@ div::-webkit-scrollbar {
 /* Icons */
 :deep(.v-icon--link::after) {
   background-color: transparent !important;
+}
+.empty-state-svg-icon {
+  width: 30rem;
+  height: 10rem;
 }
 </style>
