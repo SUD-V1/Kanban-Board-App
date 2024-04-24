@@ -13,10 +13,12 @@ const postTask = async (req, res) => {
     name: req.body.name,
     description: req.body.description,
     image: req.body.image,
+    subtitle: req.body.subtitle,
+    assignee: req.body.assignee,
+    date: req.body.date,
   });
   try {
     const newTask = await task.save();
-    console.log(section);
     section.list.push(newTask);
     await section.save();
     res
@@ -34,6 +36,8 @@ const updateTask = async (req, res) => {
   }
   task.name = req.body.name;
   task.description = req.body.description;
+  task.subtitle = req.body.subtitle;
+  task.assignee = req.body.assignee;
   await task.save();
 
   res.status(200).json(createResponse("Task created successfully", 200, task));

@@ -2,3 +2,31 @@
 //
 // The variables you want to modify
 // $font-size-root: 20px;
+
+// Scrollbar CSS
+/* width */
+::-webkit-scrollbar {
+    width: 2px !important;
+    height: 2px !important;
+    margin: -10px -10px !important;
+  }
+  
+  /* Track */
+  ::-webkit-scrollbar-track {
+    background: white !important;
+  }
+  
+  /* Handle */
+  ::-webkit-scrollbar-thumb {
+    background: black !important;
+  }
+  
+  /* Handle on hover */
+  ::-webkit-scrollbar-thumb:hover {
+    background: red !important;
+  }
+
+// Pointer CSS
+.cursor-pointer {
+    cursor: pointer;
+  }

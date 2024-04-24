@@ -1,6 +1,8 @@
 <template>
   <v-container fluid>
+    <!-- Navbar -->
     <v-row>
+      <!-- Main Navbar -->
       <v-col cols="8">
         <div class="d-flex">
           <v-btn
@@ -35,6 +37,7 @@
           </div>
         </div>
       </v-col>
+      <!-- Sub Navbar -->
       <v-col cols="4" class="d-flex align-center">
         <v-text-field
           outlined
@@ -70,6 +73,7 @@
         </v-btn></v-col
       >
     </v-row>
+    <!-- Section Container -->
     <v-row>
       <v-col>
         <v-sheet class="mx-auto" flat>
@@ -82,61 +86,12 @@
               <div class="d-flex align-center justify-space-between py-2">
                 <span class="subtitle-2 ml-1">{{ section.name }}</span>
                 <span>
-                  <v-menu
-                    :ref="`taskMenu${sectionIndex}`"
-                    :close-on-content-click="false"
-                    :close-on-click="true"
-                    :nudge-width="200"
-                    offset-x
-                    :min-width="350"
-                    :max-width="350"
+                  <button
+                    class="caption font-weight-bold mt-2"
+                    @click="addTask(section)"
                   >
-                    <template #activator="{ on, attrs }">
-                      <v-icon class="mr-1" small v-bind="attrs" v-on="on">
-                        mdi-plus
-                      </v-icon>
-                    </template>
-
-                    <v-card>
-                      <v-card-title class="pb-0">
-                        <span class="subtitle-2">Create Task</span>
-                      </v-card-title>
-                      <v-card-text class="pr-2 mt-3 mb-0 pb-0">
-                        <v-text-field
-                          placeholder="Create a title"
-                          hide-details
-                          dense
-                          outlined
-                          class="mr-2 caption rounded-lg mb-2"
-                        ></v-text-field>
-                        <v-textarea
-                          hide-details
-                          dense
-                          outlined
-                          rows="3"
-                          placeholder="Description"
-                          class="mr-2 caption rounded-lg my-2"
-                        ></v-textarea>
-                        <v-file-input
-                          accept="image/*"
-                          placeholder="Select a photo"
-                          outlined
-                          dense
-                          hide-details
-                          class="mr-2 caption rounded-lg my-2"
-                        ></v-file-input>
-                      </v-card-text>
-
-                      <v-card-actions class="grey lighten-4 my-0">
-                        <v-spacer></v-spacer>
-
-                        <v-btn text color="error" small> Cancel </v-btn>
-                        <v-btn color="success" text small class="mr-3">
-                          Save
-                        </v-btn>
-                      </v-card-actions>
-                    </v-card>
-                  </v-menu>
+                    <v-icon class="mr-1" small> mdi-plus </v-icon>
+                  </button>
                   <v-menu
                     :ref="`menu${sectionIndex}`"
                     :close-on-content-click="false"
@@ -157,9 +112,7 @@
                           v-for="(item, i) in horizontalDotsMenuLists"
                           :key="i"
                           class="cursor-pointer py-0"
-                          @click="
-                            updateSectionList(item, sectionIndex, section)
-                          "
+                          @click="updateSectionList(item, section)"
                         >
                           <v-list-item-content>
                             <v-list-item-title class="d-flex align-center">
@@ -167,11 +120,11 @@
                                 class="mr-2"
                                 small
                                 :color="
-                                  item.title === 'Delete' ? 'red' : 'green'
+                                  item.title === 'Delete' ? 'error' : 'success'
                                 "
                                 >{{ item.icon }}</v-icon
                               >
-                              <span class="caption blackColor--text">
+                              <span class="caption black--text">
                                 {{ item.title }}</span
                               >
                             </v-list-item-title>
@@ -199,8 +152,7 @@
                     :list="section.list"
                     class="list-group"
                     draggable=".item"
-                    group="a"
-                    @change="getData"
+                    group="section"
                   >
                     <div
                       v-for="(task, taskIndex) in section.list"
@@ -209,7 +161,10 @@
                     >
                       <v-card class="rounded-xl" flat outlined>
                         <v-card-title class="pt-2 pb-2">
-                          <span class="subtitle-2">{{ task.name }}</span>
+                          <span class="subtitle-2"
+                            >{{ task?.name?.substring(0, 15)
+                            }}{{ task?.name?.length > 15 ? '...' : '' }}</span
+                          >
                           <v-spacer></v-spacer>
                           <v-menu
                             :ref="`menuTask${taskIndex}`"
@@ -274,12 +229,14 @@
                         >
                           <div>
                             <v-avatar color="grey" size="27" class="mx-2">
-                              <v-icon small color="white"> mdi-account </v-icon>
+                              <img :src="task.assignee" alt="" />
                             </v-avatar>
-                            <span class="caption green--text">Today</span>
+                            <span class="caption black--text">{{
+                              task.date
+                            }}</span>
                           </div>
                           <v-chip class="caption" small color="grey lighten-3">
-                            Programing
+                            {{ task.subtitle }}
                           </v-chip>
                         </v-card-actions>
                       </v-card>
@@ -293,7 +250,7 @@
                     >
                       <button
                         class="caption font-weight-bold mt-2"
-                        @click="addSection(section)"
+                        @click="addTask(section)"
                       >
                         <v-icon color="green" small>mdi-plus</v-icon>Add Task
                       </button>
@@ -312,254 +269,82 @@
         </v-sheet>
       </v-col>
     </v-row>
+    <!-- Dialog -->
+    <!-- Dialogs for sections -->
     <v-dialog v-model="createSectionDialog" persistent max-width="290">
-      <v-form ref="form" v-model="validSection" lazy-validation>
-        <v-card>
-          <v-card-title class="pb-0">
-            <span class="subtitle-2">Create Section</span>
-          </v-card-title>
-          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
-            <v-text-field
-              v-model="sectionTitle"
-              placeholder="Create a title"
-              hide-details
-              dense
-              outlined
-              class="mr-2 caption rounded-lg mb-2"
-              :rules="nameRules"
-            ></v-text-field>
-          </v-card-text>
-
-          <v-card-actions class="grey lighten-4 my-0">
-            <v-spacer></v-spacer>
-
-            <v-btn text color="error" small @click="closeSectionDialog">
-              Cancel
-            </v-btn>
-            <v-btn
-              color="success"
-              text
-              small
-              class="mr-3"
-              :disabled="!validSection"
-              @click="createSection"
-            >
-              Save
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-form>
+      <UpdateSectionPopup
+        @createList="createSection"
+        @closeList="closeSectionDialog"
+        :contentProps="'Create'"
+        :validSectionProps="validSection"
+        :sectionTitleProps="sectionTitle"
+        :nameRulesProps="nameRules"
+      />
     </v-dialog>
     <v-dialog v-model="updateSectionDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
-        <v-card>
-          <v-card-title class="pb-0">
-            <span class="subtitle-2">Update Section</span>
-          </v-card-title>
-          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
-            <v-text-field
-              v-model="sectionTitle"
-              placeholder="Create a title"
-              hide-details
-              dense
-              outlined
-              class="mr-2 caption rounded-lg mb-2"
-              :rules="nameRules"
-            ></v-text-field>
-          </v-card-text>
-
-          <v-card-actions class="grey lighten-4 my-0">
-            <v-spacer></v-spacer>
-
-            <v-btn text color="error" small @click="closeSectionDialog">
-              Cancel
-            </v-btn>
-            <v-btn
-              color="success"
-              text
-              small
-              class="mr-3"
-              :disabled="!validSection"
-              @click="updateSection"
-            >
-              Save
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <UpdateSectionPopup
+          @createList="updateSection"
+          @closeList="closeSectionDialog"
+          :contentProps="'Update'"
+          :validSectionProps="validSection"
+          :sectionTitleProps="sectionTitle"
+          :nameRulesProps="nameRules"
+        />
       </v-form>
     </v-dialog>
     <v-dialog v-model="deleteSectionDialog" persistent max-width="290">
-      <v-card>
-        <v-card-title class="pb-0">
-          <span class="subtitle-2">Delete Section</span>
-        </v-card-title>
-        <v-card-title>
-          <span class="caption text-center"
-            ><v-icon color="yellow darken-2" class="mr-2"
-              >mdi-alert-circle-outline</v-icon
-            >Are you sure you want to delete this
-            <b class="black--text">Section?</b></span
-          >
-        </v-card-title>
-
-        <v-card-actions class="grey lighten-4 my-0">
-          <v-spacer></v-spacer>
-
-          <v-btn text color="grey" small @click="closeDeleteSectionDialog">
-            Cancel
-          </v-btn>
-          <v-btn color="error" text small class="mr-3" @click="deleteSection">
-            delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <DeletePopup
+        @deleteList="deleteSection"
+        @closeList="closeDeleteSectionDialog"
+        :title="'Section'"
+      />
     </v-dialog>
+    <!-- Dialogs for Task -->
     <v-dialog v-model="createTaskDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
-        <v-card>
-          <v-card-title class="pb-0">
-            <span class="subtitle-2">Create Task</span>
-          </v-card-title>
-          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
-            <v-text-field
-              v-model="taskName"
-              placeholder="Create a title"
-              hide-details
-              dense
-              outlined
-              class="mr-2 caption rounded-lg mb-2"
-              :rules="nameRules"
-            ></v-text-field>
-            <v-textarea
-              v-model="taskDescription"
-              hide-details
-              dense
-              outlined
-              rows="3"
-              placeholder="Description"
-              class="mr-2 caption rounded-lg my-2"
-              :rules="nameRules"
-            ></v-textarea>
-            <!-- <v-file-input
-                                v-model="taskImage"
-                                accept="image/png, image/jpeg, image/bmp"
-                                placeholder="Select a photo"
-                                outlined
-                                dense
-                                hide-details
-                                class="mr-2 caption rounded-lg my-2"
-                                :rules="rules"
-                              ></v-file-input> -->
-          </v-card-text>
-
-          <v-card-actions class="grey lighten-4 my-0">
-            <v-spacer></v-spacer>
-
-            <v-btn text color="error" small @click="closeTaskDialog">
-              Cancel
-            </v-btn>
-            <v-btn
-              color="success"
-              text
-              small
-              class="mr-3"
-              :disabled="!validTask"
-              @click="createTask"
-            >
-              Save
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <UpdateTaskPopup
+          @createList="createTask"
+          @closeList="closeTaskDialog"
+          :contentProps="'Create'"
+          :validTaskProps="validTask"
+          :taskProps="task"
+          :nameRulesProps="nameRules"
+          :peopleProps="people"
+        />
       </v-form>
     </v-dialog>
     <v-dialog v-model="updateTaskDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
-        <v-card>
-          <v-card-title class="pb-0">
-            <span class="subtitle-2">Create Task</span>
-          </v-card-title>
-          <v-card-text class="pr-2 mt-3 mb-0 pb-0">
-            <v-text-field
-              v-model="taskName"
-              placeholder="Create a title"
-              hide-details
-              dense
-              outlined
-              class="mr-2 caption rounded-lg mb-2"
-              :rules="nameRules"
-            ></v-text-field>
-            <v-textarea
-              v-model="taskDescription"
-              hide-details
-              dense
-              outlined
-              rows="3"
-              placeholder="Description"
-              class="mr-2 caption rounded-lg my-2"
-              :rules="nameRules"
-            ></v-textarea>
-            <!-- <v-file-input
-                                v-model="taskImage"
-                                accept="image/png, image/jpeg, image/bmp"
-                                placeholder="Select a photo"
-                                outlined
-                                dense
-                                hide-details
-                                class="mr-2 caption rounded-lg my-2"
-                                :rules="rules"
-                              ></v-file-input> -->
-          </v-card-text>
-
-          <v-card-actions class="grey lighten-4 my-0">
-            <v-spacer></v-spacer>
-
-            <v-btn text color="error" small @click="closeTaskDialog">
-              Cancel
-            </v-btn>
-            <v-btn
-              color="success"
-              text
-              small
-              class="mr-3"
-              :disabled="!validTask"
-              @click="updateTask"
-            >
-              Save
-            </v-btn>
-          </v-card-actions>
-        </v-card>
+        <UpdateTaskPopup
+          @createList="updateTask"
+          @closeList="closeTaskDialog"
+          :contentProps="'Create'"
+          :validTaskProps="validTask"
+          :taskProps="task"
+          :nameRulesProps="nameRules"
+          :peopleProps="people"
+        />
       </v-form>
     </v-dialog>
     <v-dialog v-model="deleteTaskDialog" persistent max-width="290">
-      <v-card>
-        <v-card-title class="pb-0">
-          <span class="subtitle-2">Delete Task</span>
-        </v-card-title>
-        <v-card-title>
-          <span class="caption text-center"
-            ><v-icon color="yellow darken-2" class="mr-2"
-              >mdi-alert-circle-outline</v-icon
-            >Are you sure you want to delete this
-            <b class="black--text">Task?</b></span
-          >
-        </v-card-title>
-
-        <v-card-actions class="grey lighten-4 my-0">
-          <v-spacer></v-spacer>
-
-          <v-btn text color="grey" small @click="closeDeleteTaskDialog">
-            Cancel
-          </v-btn>
-          <v-btn color="error" text small class="mr-3" @click="deleteTask">
-            delete
-          </v-btn>
-        </v-card-actions>
-      </v-card>
+      <DeletePopup
+        @deleteList="deleteTask"
+        @closeList="closeDeleteTaskDialog"
+        :title="'Task'"
+      />
     </v-dialog>
   </v-container>
 </template>
 <script>
 import draggable from 'vuedraggable'
+const srcs = {
+  1: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
+  2: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
+  3: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
+  4: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
+  5: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
+}
 export default {
   components: {
     draggable,
@@ -570,40 +355,26 @@ export default {
     validSection: true,
     sectionTitle: '',
     sectionId: '',
-    addSectionMenu: false,
     createSectionDialog: false,
     updateSectionDialog: false,
     deleteSectionDialog: false,
-    sectionGroups: [
-      // {
-      //   name: 'To do',
-      //   list: [
-      //     { name: 'A 1', id: 0 },
-      //     { name: 'A 2', id: 1 },
-      //     { name: 'A 3', id: 2 },
-      //   ],
-      // },
-      // {
-      //   name: 'In Progress',
-      //   list: [
-      //     { name: 'B 1', id: 0 },
-      //     { name: 'B 2', id: 1 },
-      //     { name: 'B 3', id: 2 },
-      //   ],
-      // },
-      // {
-      //   name: 'Done',
-      //   list: [
-      //     { name: 'C 1', id: 0 },
-      //     { name: 'C 2', id: 1 },
-      //     { name: 'C 3', id: 2 },
-      //   ],
-      // },
-    ],
+    sectionGroups: [],
     validTask: true,
-    taskName: '',
-    taskDescription: '',
-    taskImage: '',
+    task: {
+      name: '',
+      description: '',
+      assignee: '',
+      subtitle: '',
+      date: '',
+    },
+    defaultTask: {
+      name: '',
+      description: '',
+      assignee: '',
+      subtitle: '',
+      date: '',
+    },
+    taskId: '',
     rules: [
       (value) =>
         !value ||
@@ -617,16 +388,31 @@ export default {
       { title: 'Edit', icon: 'mdi-pencil' },
       { title: 'Delete', icon: 'mdi-delete' },
     ],
+    people: [
+      { header: 'Group 1' },
+      { name: 'Sandra Adams', group: 'Group 1', avatar: srcs[1] },
+      { name: 'Ali Connors', group: 'Group 1', avatar: srcs[2] },
+      { name: 'Trevor Hansen', group: 'Group 1', avatar: srcs[3] },
+      { name: 'Tucker Smith', group: 'Group 1', avatar: srcs[2] },
+      { divider: true },
+      { header: 'Group 2' },
+      { name: 'Britta Holt', group: 'Group 2', avatar: srcs[4] },
+      { name: 'Jane Smith ', group: 'Group 2', avatar: srcs[5] },
+      { name: 'John Smith', group: 'Group 2', avatar: srcs[1] },
+      { name: 'Sandra Williams', group: 'Group 2', avatar: srcs[3] },
+    ],
   }),
   created() {
     this.getAllSections()
   },
   methods: {
-    async createSection() {
+    // Section CRUD API Integration
+    // POST API
+    async createSection(value) {
       try {
-        if (this.$refs.form.validate()) {
+        if (value?.length) {
           const payload = {
-            name: this.sectionTitle,
+            name: value,
           }
           const response = await this.$axios.$post('/sections', payload)
           if (response.status === 200 || response.status === 201) {
@@ -641,7 +427,8 @@ export default {
         this.sectionTitle = ''
       }
     },
-    updateSectionList(item, sectionIndex, section) {
+    // PUT API
+    updateSectionList(item, section) {
       this.sectionId = section?._id
       if (item.title === 'Edit') {
         this.updateSectionDialog = true
@@ -652,11 +439,11 @@ export default {
         this.sectionTitle = ''
       }
     },
-    async updateSection() {
+    async updateSection(value) {
       try {
-        if (this.$refs.form.validate()) {
+        if (value?.length) {
           const payload = {
-            name: this.sectionTitle,
+            name: value,
           }
           const response = await this.$axios.$put(
             `/sections/${this.sectionId}`,
@@ -676,6 +463,7 @@ export default {
         this.sectionId = ''
       }
     },
+    // DELETE API
     async deleteSection() {
       try {
         const response = await this.$axios.$delete(
@@ -696,6 +484,7 @@ export default {
         this.sectionId = ''
       }
     },
+    // GET API
     async getAllSections() {
       try {
         const response = await this.$axios.$get('/sections')
@@ -707,6 +496,7 @@ export default {
         console.log(error)
       }
     },
+    // Close Dialog
     closeSectionDialog() {
       this.createSectionDialog = false
       this.updateSectionDialog = false
@@ -714,62 +504,58 @@ export default {
     closeDeleteSectionDialog() {
       this.deleteSectionDialog = false
     },
-    closeTaskMenu() {},
-    addSection(section) {
+
+    // Task CRUD API Integration
+    // Getting section is
+    addTask(section) {
       this.sectionId = section._id
       this.createTaskDialog = true
     },
+    // POST API
     async createTask() {
       try {
-        console.log(this.$refs)
-        // if (
-        //   this.$refs.formTask.validate() ||
-        //   this.$refs.formTask[sectionIndex].validate() ||
-        //   this.$refs.formTask[0].validate()
-        // ) {
-        const payload = {
-          name: this.taskName,
-          description: this.taskDescription,
-          taskImage: this.taskImage,
+        if (
+          this.task?.name?.length &&
+          this.task?.description?.length &&
+          this.task?.subtitle?.length
+        ) {
+          const payload = { ...this.task }
+          const response = await this.$axios.$post(
+            `/sections/${this.sectionId}/task`,
+            payload
+          )
+          if (response.status === 200 || response.status === 201) {
+            this.getAllSections()
+            this.createTaskDialog = false
+            this.task = { ...this.defaultTask }
+          }
         }
-        const response = await this.$axios.$post(
-          `/sections/${this.sectionId}/task`,
-          payload
-        )
-        if (response.status === 200 || response.status === 201) {
-          this.getAllSections()
-          this.createTaskDialog = false
-        }
-        // }
       } catch (error) {
         this.createTaskDialog = false
+        this.task = { ...this.defaultTask }
         console.log(error)
       }
     },
+    // PUT API
     updateTaskList(item, section, task) {
       this.sectionId = section?._id
       this.taskId = task._id
       if (item.title === 'Edit') {
         this.updateTaskDialog = true
-        this.taskName = task?.name
-        this.taskDescription = task?.description
-        this.taskImage = task?.image
+        this.task = { ...task }
       } else {
-        this.updateTaskDialog = false
         this.deleteTaskDialog = true
-        this.taskName = ''
-        this.taskDescription = ''
-        this.taskImage = ''
+        this.task = { ...this.defaultTask }
       }
     },
     async updateTask() {
       try {
-        if (this.$refs.form.validate()) {
-          const payload = {
-            name: this.taskName,
-            description: this.taskDescription,
-            image: this.taskImage,
-          }
+        if (
+          this.task?.name?.length &&
+          this.task?.description?.length &&
+          this.task?.subtitle?.length
+        ) {
+          const payload = { ...this.task }
           const response = await this.$axios.$put(
             `/sections/${this.sectionId}/task/${this.taskId}`,
             payload
@@ -778,20 +564,17 @@ export default {
             this.getAllSections()
             this.updateTaskDialog = false
             this.sectionId = ''
-            this.taskName = ''
-            this.taskDescription = ''
-            this.taskImage = ''
+            this.task = { ...this.defaultTask }
           }
         }
       } catch (error) {
         console.log(error)
         this.updateTaskDialog = false
         this.sectionId = ''
-        this.taskName = ''
-        this.taskDescription = ''
-        this.taskImage = ''
+        this.task = { ...this.defaultTask }
       }
     },
+    // DELETE API
     async deleteTask() {
       try {
         const response = await this.$axios.$delete(
@@ -799,79 +582,40 @@ export default {
         )
         if (response.status === 200) {
           this.getAllSections()
-          this.updateTaskDialog = false
           this.deleteTaskDialog = false
           this.sectionId = ''
-          this.taskName = ''
-          this.taskDescription = ''
-          this.taskImage = ''
+          this.task = { ...this.defaultTask }
         }
       } catch (error) {
         console.log(error)
-        this.updateTaskDialog = false
         this.deleteTaskDialog = false
         this.sectionId = ''
-        this.taskName = ''
-        this.taskDescription = ''
-        this.taskImage = ''
+        this.task = { ...this.defaultTask }
       }
     },
+    // Close Dialogs
     closeTaskDialog() {
-      console.log('hjh')
       this.createTaskDialog = false
       this.updateTaskDialog = false
     },
     closeDeleteTaskDialog() {
       this.deleteTaskDialog = false
     },
-    getData(event, parentId){
-      console.log(event, parentId)
-    },
-    // startDrag(value, old){
-    //   console.log(value, old)
-    // },
-    // dragComplete(value, old){
-    //   console.log(value, old)
-    // },
-    // checkMove(value){
-    //   console.log(value, "MOVE")
-    // }
   },
 }
 </script>
 <style scoped>
-/* width */
-::-webkit-scrollbar {
-  width: 2px !important;
-  height: 2px !important;
-  margin: -10px -10px !important;
-}
-
-/* Track */
-::-webkit-scrollbar-track {
-  background: white !important;
-}
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-  background: black !important;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: red !important;
-}
+/* Hide Scrollbar for div */
 div::-webkit-scrollbar {
   display: none;
 }
+/* Card content height and overflow text */
 .card-content {
   height: 40px;
   width: 100%;
   overflow-y: auto;
 }
-.cursor-pointer {
-  cursor: pointer;
-}
+/* Menu list  */
 .v-list {
   border-radius: 10px !important;
   padding: 4px 4px !important;
@@ -895,10 +639,12 @@ div::-webkit-scrollbar {
   border-radius: 18px !important;
   color: black !important;
 }
+/* Dialog */
 :deep(.v-dialog) {
   box-shadow: none !important;
   border-radius: 20px !important;
 }
+/* Icons */
 :deep(.v-icon--link::after) {
   background-color: transparent !important;
 }
