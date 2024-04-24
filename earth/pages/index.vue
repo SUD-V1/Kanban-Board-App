@@ -301,6 +301,7 @@
     </v-row>
     <!-- Dialog -->
     <!-- Dialogs for sections -->
+    <!-- Create popup for task -->
     <v-dialog v-model="createSectionDialog" persistent max-width="290">
       <UpdateSectionPopup
         :content-props="'Create'"
@@ -311,6 +312,7 @@
         @closeList="closeSectionDialog"
       />
     </v-dialog>
+    <!-- Update popup for section -->
     <v-dialog v-model="updateSectionDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
         <UpdateSectionPopup
@@ -323,6 +325,7 @@
         />
       </v-form>
     </v-dialog>
+    <!-- Delete popup for section -->
     <v-dialog v-model="deleteSectionDialog" persistent max-width="290">
       <DeletePopup
         :title="'Section'"
@@ -331,6 +334,7 @@
       />
     </v-dialog>
     <!-- Dialogs for Task -->
+    <!-- Create popup for task -->
     <v-dialog v-model="createTaskDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
         <UpdateTaskPopup
@@ -344,6 +348,7 @@
         />
       </v-form>
     </v-dialog>
+    <!-- Update popup for task -->
     <v-dialog v-model="updateTaskDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
         <UpdateTaskPopup
@@ -357,6 +362,7 @@
         />
       </v-form>
     </v-dialog>
+    <!-- Delete popup for task -->
     <v-dialog v-model="deleteTaskDialog" persistent max-width="290">
       <DeletePopup
         :title="'Task'"
@@ -368,6 +374,7 @@
 </template>
 <script>
 import draggable from 'vuedraggable'
+// Imported photos url from vuetify.com
 const srcs = {
   1: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
   2: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
@@ -405,12 +412,6 @@ export default {
       date: '',
     },
     taskId: '',
-    rules: [
-      (value) =>
-        !value ||
-        value.size < 2000000 ||
-        'Avatar size should be less than 2 MB!',
-    ],
     createTaskDialog: false,
     updateTaskDialog: false,
     deleteTaskDialog: false,
@@ -445,30 +446,28 @@ export default {
         list: [],
       },
     ],
-    defaultSectionTasksLists: [
+    defaultSectionTaskLists: [
       {
         name: 'Kanban Integration',
         description:
           'A Kanban board is a visual tool used to manage and visualize work.',
         assignee: srcs[2],
-        subtitle: 'Integration',
+        subtitle: 'Program',
         date: '2024-04-24',
       },
       {
         name: 'Kanban Integration',
-        description:
-          'A Kanban board is a visual tool used to manage and visualize work.',
+        description: 'A Kanban board is a visual tool.',
         assignee: srcs[3],
         subtitle: 'Integration',
-        date: '2024-04-24',
+        date: '2024-04-25',
       },
       {
         name: 'Kanban Board Dialogs',
-        description:
-          'A Kanban board is a visual tool used to manage and visualize work.',
+        description: 'A Kanban board is used to manage and visualize work.',
         assignee: srcs[5],
         subtitle: 'Design',
-        date: '2024-04-24',
+        date: '2024-04-26',
       },
     ],
   }),
@@ -496,9 +495,10 @@ export default {
         }
       }
     },
+    // Inserting default section tasks
     async defaultSectionTasks(id) {
       try {
-        const payload = [...this.defaultSectionTasksLists]
+        const payload = [...this.defaultSectionTaskLists]
         const response = await this.$axios.$post(
           `/sections/${id}/bulk-insert`,
           payload
@@ -508,7 +508,9 @@ export default {
         }
       } catch (error) {}
     },
+
     // Section CRUD API Integration
+
     // POST API
     async createSection(value) {
       try {
@@ -519,14 +521,17 @@ export default {
           const response = await this.$axios.$post('/sections', payload)
           if (response.status === 200 || response.status === 201) {
             this.getAllSections()
-            this.createSectionDialog = false
-            this.sectionTitle = ''
+            this.clearCreateData()
           }
         }
       } catch (error) {
-        this.createSectionDialog = false
-        this.sectionTitle = ''
+        this.clearCreateData()
       }
+    },
+    // Clearing the exist data stored in field
+    clearCreateData() {
+      this.createSectionDialog = false
+      this.sectionTitle = ''
     },
     // PUT API
     updateSectionList(item, section) {
@@ -535,7 +540,6 @@ export default {
         this.updateSectionDialog = true
         this.sectionTitle = section?.name
       } else {
-        this.updateSectionDialog = false
         this.deleteSectionDialog = true
         this.sectionTitle = ''
       }
@@ -552,16 +556,18 @@ export default {
           )
           if (response.status === 200) {
             this.getAllSections()
-            this.updateSectionDialog = false
-            this.sectionTitle = ''
-            this.sectionId = ''
+            this.clearUpdateData()
           }
         }
       } catch (error) {
-        this.updateSectionDialog = false
-        this.sectionTitle = ''
-        this.sectionId = ''
+        this.clearUpdateData()
       }
+    },
+    // Clearing the exist data stored in field
+    clearUpdateData() {
+      this.updateSectionDialog = false
+      this.sectionTitle = ''
+      this.sectionId = ''
     },
     // DELETE API
     async deleteSection() {
@@ -571,17 +577,18 @@ export default {
         )
         if (response.status === 200) {
           this.getAllSections()
-          this.updateSectionDialog = false
-          this.deleteSectionDialog = false
-          this.sectionTitle = ''
-          this.sectionId = ''
+          this.clearDeleteData()
         }
       } catch (error) {
-        this.updateSectionDialog = false
-        this.deleteSectionDialog = false
-        this.sectionTitle = ''
-        this.sectionId = ''
+        this.clearDeleteData()
       }
+    },
+    // Clearing the exist data stored in field
+    clearDeleteData() {
+      this.updateSectionDialog = false
+      this.deleteSectionDialog = false
+      this.sectionTitle = ''
+      this.sectionId = ''
     },
     // GET API
     async getAllSections() {
@@ -663,16 +670,19 @@ export default {
           )
           if (response.status === 200 || response.status === 201) {
             this.getAllSections()
-            this.updateTaskDialog = false
-            this.sectionId = ''
+            this.clearUpdateTaskData()
             this.clearData()
           }
         }
       } catch (error) {
-        this.updateTaskDialog = false
-        this.sectionId = ''
+        this.clearUpdateTaskData()
         this.clearData()
       }
+    },
+    // Clearing the exist data stored in field
+    clearUpdateTaskData() {
+      this.updateTaskDialog = false
+      this.sectionId = ''
     },
     // DELETE API
     async deleteTask() {
@@ -682,17 +692,19 @@ export default {
         )
         if (response.status === 200) {
           this.getAllSections()
-          this.deleteTaskDialog = false
-          this.sectionId = ''
-          this.taskId = ''
+          this.clearDeleteTaskData()
           this.clearData()
         }
       } catch (error) {
-        this.deleteTaskDialog = false
-        this.sectionId = ''
-        this.taskId = ''
+        this.clearDeleteTaskData()
         this.clearData()
       }
+    },
+    // Clearing the exist data stored in field
+    clearDeleteTaskData() {
+      this.deleteTaskDialog = false
+      this.sectionId = ''
+      this.taskId = ''
     },
     // Close Dialogs
     closeTaskDialog() {

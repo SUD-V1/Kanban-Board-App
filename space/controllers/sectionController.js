@@ -1,5 +1,7 @@
 const Section = require("../models/sectionModel");
 const createResponse = require("../helpers/sectionHelper");
+
+// GET all sections
 const getSection = async (req, res) => {
   try {
     const sections = await Section.find().populate("list");
@@ -9,6 +11,7 @@ const getSection = async (req, res) => {
   }
 };
 
+// Create section
 const postSection = async (req, res) => {
   const section = new Section({
     name: req.body.name,
@@ -22,22 +25,23 @@ const postSection = async (req, res) => {
     res.status(400).json(createResponse("Error", 400, err.message));
   }
 };
-const postBulkSection = async (req, res) => {
-  const defaultSections = req.body; // Assuming req.body is an array of parent documents
 
+// Create bulk section
+const postBulkSection = async (req, res) => {
+  const defaultSections = req.body;
   try {
-    // Insert the section documents into the database
     const insertedSections = await Section.insertMany(defaultSections);
     res
       .status(201)
       .json(
         createResponse("Sections inserted successfully", 201, insertedSections)
       );
-  } catch (error) {
-    console.error("Error inserting parents:", error);
-    res.status(500).json(createResponse("Error", 500, error.message));
+  } catch (err) {
+    res.status(500).json(createResponse("Error", 500, err.message));
   }
 };
+
+// Update section
 const updateSection = async (req, res) => {
   try {
     const updatedSection = await Section.findByIdAndUpdate(
@@ -48,7 +52,7 @@ const updateSection = async (req, res) => {
     if (!updatedSection) {
       return res
         .status(404)
-        .json(createResponse("Error", 404, "Section not found"));
+        .json(createResponse("Error", 404, "Section not found!"));
     }
     res
       .status(200)
@@ -59,13 +63,15 @@ const updateSection = async (req, res) => {
     res.status(500).json(createResponse("Error", 500, err.message));
   }
 };
+
+// Delete section
 const deleteSection = async (req, res) => {
   try {
     const section = await Section.findById(req.params.id);
     if (!section) {
       return res
         .status(404)
-        .json(createResponse("Error", 404, "Section not found"));
+        .json(createResponse("Error", 404, "Section not found!"));
     }
     await Section.findByIdAndDelete(section._id);
     res
@@ -75,6 +81,8 @@ const deleteSection = async (req, res) => {
     res.status(500).json(createResponse("Error", 500, err.message));
   }
 };
+
+// Export functions
 module.exports = {
   getSection,
   postSection,

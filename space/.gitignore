@@ -1,8 +1,4 @@
-# Created by .ignore support plugin (hsz.mobi)
-
 # Dependency directories
 node_modules/
 
-# Optional npm cache directory
-.npm
 

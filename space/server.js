@@ -3,10 +3,14 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
 const app = express();
+
 const port = process.env.PORT || 4000;
+// Import the routes
 const sectionRoutes = require("./routes/section");
 const taskRoutes = require("./routes/task");
+// Defined cors options
 const corsOptions = {
   origin: "*",
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
@@ -28,10 +32,7 @@ app.use(sectionRoutes);
 app.use(taskRoutes);
 
 // Connect to MongoDB
-mongoose.connect(process.env.mongodb_URL, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(process.env.mongodb_URL);
 const db = mongoose.connection;
 db.on("error", console.error.bind(console, "connection error:"));
 db.once("open", function () {

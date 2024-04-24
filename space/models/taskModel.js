@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
+
 const taskSchema = new mongoose.Schema(
   {
     name: String,
     description: String,
     subtitle: String,
     assignee: String,
-    date: String
+    date: String,
   },
   { timestamps: true }
 );

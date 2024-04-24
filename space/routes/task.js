@@ -6,6 +6,7 @@ const {
   updateTask,
   deleteTask,
 } = require("../controllers/taskController");
+
 router.post("/sections/:sectionId/task", postTask);
 router.post("/sections/:sectionId/bulk-insert", postBulkTask);
 router.put("/sections/:sectionId/task/:taskId", updateTask);
