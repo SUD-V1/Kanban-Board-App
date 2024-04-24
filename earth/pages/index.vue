@@ -159,15 +159,17 @@
                     @change="updatedSectionTaskList($event, section)"
                   >
                     <div
-                      v-for="(task, taskIndex) in section.list"
-                      :key="task._id"
+                      v-for="(taskList, taskIndex) in section.list"
+                      :key="taskList._id"
                       class="item mb-2"
                     >
                       <v-card class="rounded-xl" flat outlined>
                         <v-card-title class="pt-2 pb-2">
                           <span class="subtitle-2"
-                            >{{ task?.name?.substring(0, 15)
-                            }}{{ task?.name?.length > 15 ? '...' : '' }}</span
+                            >{{ taskList?.name?.substring(0, 15)
+                            }}{{
+                              taskList?.name?.length > 15 ? '...' : ''
+                            }}</span
                           >
                           <v-spacer></v-spacer>
                           <v-menu
@@ -195,7 +197,9 @@
                                   v-for="(item, i) in horizontalDotsMenuLists"
                                   :key="i"
                                   class="cursor-pointer py-0"
-                                  @click="updateTaskList(item, section, task)"
+                                  @click="
+                                    updateTaskList(item, section, taskList)
+                                  "
                                 >
                                   <v-list-item-content>
                                     <v-list-item-title
@@ -222,10 +226,8 @@
                           </v-menu>
                         </v-card-title>
 
-                        <v-card-text
-                          class="caption font-weight-medium card-content pr-2"
-                        >
-                          {{ task.description }}
+                        <v-card-text class="card-content pr-2">
+                          {{ taskList.description }}
                         </v-card-text>
 
                         <v-card-actions
@@ -234,18 +236,19 @@
                           <div>
                             <v-avatar color="grey" size="27" class="mx-2">
                               <img
-                                v-if="task?.assignee"
-                                :src="task.assignee"
+                                v-if="taskList?.assignee"
+                                :src="taskList.assignee"
                                 alt=""
                               />
-                              <v-icon v-else>mdi-account</v-icon>
+                              <v-icon v-else color="white">mdi-account</v-icon>
                             </v-avatar>
-                            <span class="caption black--text">{{
-                              task.date
+                            <span class="caption grey--text">{{
+                              taskList.date
                             }}</span>
                           </div>
-                          <v-chip class="caption" small color="grey lighten-3">
-                            {{ task.subtitle?.substring(0, 6) }}
+                          <v-chip class="caption" small color="grey lighten-4">
+                            {{ taskList.subtitle?.substring(0, 7)
+                            }}{{ taskList?.subtitle?.length > 8 ? '...' : '' }}
                           </v-chip>
                         </v-card-actions>
                       </v-card>
@@ -300,65 +303,65 @@
     <!-- Dialogs for sections -->
     <v-dialog v-model="createSectionDialog" persistent max-width="290">
       <UpdateSectionPopup
+        :content-props="'Create'"
+        :valid-section-props="validSection"
+        :section-title-props="sectionTitle"
+        :name-rules-props="nameRules"
         @createList="createSection"
         @closeList="closeSectionDialog"
-        :contentProps="'Create'"
-        :validSectionProps="validSection"
-        :sectionTitleProps="sectionTitle"
-        :nameRulesProps="nameRules"
       />
     </v-dialog>
     <v-dialog v-model="updateSectionDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
         <UpdateSectionPopup
+          :content-props="'Update'"
+          :valid-section-props="validSection"
+          :section-title-props="sectionTitle"
+          :name-rules-props="nameRules"
           @createList="updateSection"
           @closeList="closeSectionDialog"
-          :contentProps="'Update'"
-          :validSectionProps="validSection"
-          :sectionTitleProps="sectionTitle"
-          :nameRulesProps="nameRules"
         />
       </v-form>
     </v-dialog>
     <v-dialog v-model="deleteSectionDialog" persistent max-width="290">
       <DeletePopup
+        :title="'Section'"
         @deleteList="deleteSection"
         @closeList="closeDeleteSectionDialog"
-        :title="'Section'"
       />
     </v-dialog>
     <!-- Dialogs for Task -->
     <v-dialog v-model="createTaskDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
         <UpdateTaskPopup
+          :content-props="'Create'"
+          :valid-task-props="validTask"
+          :task-props="task"
+          :name-rules-props="nameRules"
+          :people-props="people"
           @createList="createTask"
           @closeList="closeTaskDialog"
-          :contentProps="'Create'"
-          :validTaskProps="validTask"
-          :taskProps="task"
-          :nameRulesProps="nameRules"
-          :peopleProps="people"
         />
       </v-form>
     </v-dialog>
     <v-dialog v-model="updateTaskDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
         <UpdateTaskPopup
+          :content-props="'Create'"
+          :valid-task-props="validTask"
+          :task-props="task"
+          :name-rules-props="nameRules"
+          :people-props="people"
           @createList="updateTask"
           @closeList="closeTaskDialog"
-          :contentProps="'Create'"
-          :validTaskProps="validTask"
-          :taskProps="task"
-          :nameRulesProps="nameRules"
-          :peopleProps="people"
         />
       </v-form>
     </v-dialog>
     <v-dialog v-model="deleteTaskDialog" persistent max-width="290">
       <DeletePopup
+        :title="'Task'"
         @deleteList="deleteTask"
         @closeList="closeDeleteTaskDialog"
-        :title="'Task'"
       />
     </v-dialog>
   </v-container>
@@ -431,58 +434,41 @@ export default {
     defaultSectionsLists: [
       {
         name: 'To do',
-        list: [
-          // {
-          //   name: 'Kanban Board',
-          //   description:
-          //     'A Kanban board is a visual tool used to manage and visualize work.',
-          //   assignee: srcs[1],
-          //   subtitle: 'Design',
-          //   date: '2024-04-24',
-          // },
-        ],
+        list: [],
       },
       {
         name: 'In Progress',
-        list: [
-          // {
-          //   name: 'Kanban Integration',
-          //   description:
-          //     'A Kanban board is a visual tool used to manage and visualize work.',
-          //   assignee: srcs[2],
-          //   subtitle: 'Integration',
-          //   date: '2024-04-24',
-          // },
-          // {
-          //   name: 'Kanban Integration',
-          //   description:
-          //     'A Kanban board is a visual tool used to manage and visualize work.',
-          //   assignee: srcs[3],
-          //   subtitle: 'Integration',
-          //   date: '2024-04-24',
-          // },
-          // {
-          //   name: 'Kanban Integration',
-          //   description:
-          //     'A Kanban board is a visual tool used to manage and visualize work.',
-          //   assignee: srcs[4],
-          //   subtitle: 'Integration',
-          //   date: '2024-04-24',
-          // },
-        ],
+        list: [],
       },
       {
         name: 'Done',
-        list: [
-          // {
-          //   name: 'Kanban Board Dialogs',
-          //   description:
-          //     'A Kanban board is a visual tool used to manage and visualize work.',
-          //   assignee: srcs[5],
-          //   subtitle: 'Design',
-          //   date: '2024-04-24',
-          // },
-        ],
+        list: [],
+      },
+    ],
+    defaultSectionTasksLists: [
+      {
+        name: 'Kanban Integration',
+        description:
+          'A Kanban board is a visual tool used to manage and visualize work.',
+        assignee: srcs[2],
+        subtitle: 'Integration',
+        date: '2024-04-24',
+      },
+      {
+        name: 'Kanban Integration',
+        description:
+          'A Kanban board is a visual tool used to manage and visualize work.',
+        assignee: srcs[3],
+        subtitle: 'Integration',
+        date: '2024-04-24',
+      },
+      {
+        name: 'Kanban Board Dialogs',
+        description:
+          'A Kanban board is a visual tool used to manage and visualize work.',
+        assignee: srcs[5],
+        subtitle: 'Design',
+        date: '2024-04-24',
       },
     ],
   }),
@@ -500,54 +486,19 @@ export default {
             payload
           )
           if (response.status === 200 || response.status === 201) {
-            console.log(response, 'opop')
             response?.data?.forEach((section) => {
-            this.defaultSectionTasks(section._id)
+              this.defaultSectionTasks(section._id)
             })
             this.getAllSections()
           }
         } catch (error) {
-          console.log(error)
           this.createSectionDialog = false
         }
       }
     },
     async defaultSectionTasks(id) {
       try {
-        const payload = [
-          {
-            name: 'Kanban Integration',
-            description:
-              'A Kanban board is a visual tool used to manage and visualize work.',
-            assignee: srcs[2],
-            subtitle: 'Integration',
-            date: '2024-04-24',
-          },
-          {
-            name: 'Kanban Integration',
-            description:
-              'A Kanban board is a visual tool used to manage and visualize work.',
-            assignee: srcs[2],
-            subtitle: 'Integration',
-            date: '2024-04-24',
-          },
-          {
-            name: 'Kanban Integration',
-            description:
-              'A Kanban board is a visual tool used to manage and visualize work.',
-            assignee: srcs[2],
-            subtitle: 'Integration',
-            date: '2024-04-24',
-          },
-          {
-            name: 'Kanban Integration',
-            description:
-              'A Kanban board is a visual tool used to manage and visualize work.',
-            assignee: srcs[2],
-            subtitle: 'Integration',
-            date: '2024-04-24',
-          },
-        ]
+        const payload = [...this.defaultSectionTasksLists]
         const response = await this.$axios.$post(
           `/sections/${id}/bulk-insert`,
           payload
@@ -555,9 +506,7 @@ export default {
         if (response.status === 200 || response.status === 201) {
           this.getAllSections()
         }
-      } catch (error) {
-        console.log(error)
-      }
+      } catch (error) {}
     },
     // Section CRUD API Integration
     // POST API
@@ -575,7 +524,6 @@ export default {
           }
         }
       } catch (error) {
-        console.log(error)
         this.createSectionDialog = false
         this.sectionTitle = ''
       }
@@ -610,7 +558,6 @@ export default {
           }
         }
       } catch (error) {
-        console.log(error)
         this.updateSectionDialog = false
         this.sectionTitle = ''
         this.sectionId = ''
@@ -630,7 +577,6 @@ export default {
           this.sectionId = ''
         }
       } catch (error) {
-        console.log(error)
         this.updateSectionDialog = false
         this.deleteSectionDialog = false
         this.sectionTitle = ''
@@ -642,23 +588,23 @@ export default {
       try {
         const response = await this.$axios.$get('/sections')
         if (response.status === 200) {
-          console.log(response)
           if (!response?.data?.length) {
             await this.defaultSections()
           }
           this.sectionGroups = [...response?.data]
         }
-      } catch (error) {
-        console.log(error)
-      }
+      } catch (error) {}
     },
     // Close Dialog
     closeSectionDialog() {
       this.createSectionDialog = false
       this.updateSectionDialog = false
+      this.sectionTitle = ''
     },
     closeDeleteSectionDialog() {
       this.deleteSectionDialog = false
+      this.sectionTitle = ''
+      this.sectionId = ''
     },
 
     // Task CRUD API Integration
@@ -683,13 +629,12 @@ export default {
           if (response.status === 200 || response.status === 201) {
             this.getAllSections()
             this.createTaskDialog = false
-            this.task = { ...this.defaultTask }
+            this.clearData()
           }
         }
       } catch (error) {
         this.createTaskDialog = false
-        this.task = { ...this.defaultTask }
-        console.log(error)
+        this.clearData()
       }
     },
     // PUT API
@@ -701,7 +646,7 @@ export default {
         this.task = { ...task }
       } else {
         this.deleteTaskDialog = true
-        this.task = { ...this.defaultTask }
+        this.clearData()
       }
     },
     async updateTask() {
@@ -720,14 +665,13 @@ export default {
             this.getAllSections()
             this.updateTaskDialog = false
             this.sectionId = ''
-            this.task = { ...this.defaultTask }
+            this.clearData()
           }
         }
       } catch (error) {
-        console.log(error)
         this.updateTaskDialog = false
         this.sectionId = ''
-        this.task = { ...this.defaultTask }
+        this.clearData()
       }
     },
     // DELETE API
@@ -740,22 +684,25 @@ export default {
           this.getAllSections()
           this.deleteTaskDialog = false
           this.sectionId = ''
-          this.task = { ...this.defaultTask }
+          this.taskId = ''
+          this.clearData()
         }
       } catch (error) {
-        console.log(error)
         this.deleteTaskDialog = false
         this.sectionId = ''
-        this.task = { ...this.defaultTask }
+        this.taskId = ''
+        this.clearData()
       }
     },
     // Close Dialogs
     closeTaskDialog() {
       this.createTaskDialog = false
       this.updateTaskDialog = false
+      this.clearData()
     },
     closeDeleteTaskDialog() {
       this.deleteTaskDialog = false
+      this.clearData()
     },
     // Moving Task one section two another section
     async updatedSectionTaskList(event, section) {
@@ -771,9 +718,7 @@ export default {
           if (response.status === 200 || response.status === 201) {
             this.getAllSections()
           }
-        } catch (error) {
-          console.log(error)
-        }
+        } catch (error) {}
       } else if (event?.removed) {
         const task = await event?.removed?.element
         try {
@@ -783,9 +728,17 @@ export default {
           if (response.status === 200) {
             this.getAllSections()
           }
-        } catch (error) {
-          console.log(error)
-        }
+        } catch (error) {}
+      }
+    },
+    // Clear data from popup
+    clearData() {
+      this.task = {
+        name: '',
+        description: '',
+        assignee: '',
+        subtitle: '',
+        date: '',
       }
     },
   },
@@ -801,6 +754,9 @@ div::-webkit-scrollbar {
   height: 40px;
   width: 100%;
   overflow-y: auto;
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 18px;
 }
 /* Menu list  */
 .v-list {
