@@ -136,11 +136,8 @@
                 </span>
               </div>
               <v-card
-                class="overflow-auto rounded-xl mb-2"
+                class="overflow-auto rounded-xl mb-2 card-section"
                 color="grey lighten-5"
-                :height="450"
-                :min-height="450"
-                :max-height="450"
                 :width="235"
                 :min-width="235"
                 :max-width="235"
@@ -806,5 +803,10 @@ div::-webkit-scrollbar {
 .empty-state-svg-icon {
   width: 30rem;
   height: 10rem;
+}
+.card-section {
+  height: 90vh;
+  min-height: 90vh;
+  max-height: 90vh;
 }
 </style>
