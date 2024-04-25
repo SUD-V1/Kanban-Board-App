@@ -29,8 +29,8 @@
             <v-icon color="white">mdi-apple</v-icon>
           </v-btn>
           <div class="d-flex flex-column">
-            <span class="subtitle-2">Apple</span>
-            <span class="caption"
+            <span class="poppins-regular font-weight-bold">Apple</span>
+            <span class="poppins-regular"
               >5 boards <v-icon class="mx-0 px-0">mdi-circle-small</v-icon> 24
               members</span
             >
@@ -45,7 +45,7 @@
           prepend-inner-icon="mdi-magnify"
           hide-details
           dense
-          class="mr-2 caption rounded-lg"
+          class="mr-2 poppins-regular rounded-lg"
         ></v-text-field>
         <v-btn
           :min-height="40"
@@ -84,10 +84,10 @@
               class="mx-2"
             >
               <div class="d-flex align-center justify-space-between my-2">
-                <div class="">{{ section.name }}</div>
+                <div class="poppins-medium">{{ section.name }}</div>
                 <div class="d-flex align-center">
                   <v-btn
-                    class="caption font-weight-bold"
+                    class="poppins-regular font-weight-bold mr-1"
                     fab
                     x-small
                     text
@@ -105,7 +105,7 @@
                   >
                     <template #activator="{ on, attrs }">
                       <v-btn
-                        class="caption font-weight-bold"
+                        class="poppins-regular font-weight-bold"
                         fab
                         x-small
                         text
@@ -135,7 +135,7 @@
                                 "
                                 >{{ item.icon }}</v-icon
                               >
-                              <span class="caption black--text">
+                              <span class="poppins-regular black--text">
                                 {{ item.title }}</span
                               >
                             </v-list-item-title>
@@ -173,7 +173,7 @@
                     >
                       <v-card class="rounded-xl" flat outlined>
                         <v-card-title class="pt-2 pb-2">
-                          <span class="subtitle-2"
+                          <span class="poppins-medium"
                             >{{ taskList?.name?.substring(0, 15)
                             }}{{
                               taskList?.name?.length > 15 ? '...' : ''
@@ -223,7 +223,7 @@
                                         "
                                         >{{ item.icon }}</v-icon
                                       >
-                                      <span class="caption blackColor--text">
+                                      <span class="poppins-regular blackColor--text">
                                         {{ item.title }}</span
                                       >
                                     </v-list-item-title>
@@ -242,7 +242,7 @@
                           class="d-flex align-center justify-space-between"
                         >
                           <div>
-                            <v-avatar color="grey" size="27" class="mx-2">
+                            <v-avatar color="grey" size="27" class="ml-2">
                               <img
                                 v-if="taskList?.assignee"
                                 :src="taskList.assignee"
@@ -250,11 +250,11 @@
                               />
                               <v-icon v-else color="white">mdi-account</v-icon>
                             </v-avatar>
-                            <span class="caption grey--text">{{
+                            <span class="poppins-regular grey--text">{{
                               taskList.date
                             }}</span>
                           </div>
-                          <v-chip class="caption" small color="grey lighten-4">
+                          <v-chip class="poppins-regular" small color="grey lighten-4">
                             {{ taskList.subtitle?.substring(0, 7)
                             }}{{ taskList?.subtitle?.length > 8 ? '...' : '' }}
                           </v-chip>
@@ -269,7 +269,7 @@
                       aria-label="Basic example"
                     >
                       <v-btn
-                        class="caption font-weight-bold mt-2"
+                        class="poppins-regular font-weight-medium mt-2"
                         small
                         text
                         @click="addTask(section)"
@@ -284,7 +284,7 @@
             <div class="my-2">
               <v-btn
                 v-if="sectionGroups?.length"
-                class="font-weight-bold"
+                class="font-weight-medium"
                 small
                 text
                 @click="createSectionDialog = true"
@@ -305,7 +305,7 @@
             alt="EmptyState"
           />
           <v-btn
-            class="caption font-weight-bold"
+            class="poppins-regular font-weight-bold"
             small
             text
             @click="createSectionDialog = true"
