@@ -83,15 +83,18 @@
               :key="section._id"
               class="mx-2"
             >
-              <div class="d-flex align-center justify-space-between py-2">
-                <span class="subtitle-2 ml-1">{{ section.name }}</span>
-                <span>
-                  <button
-                    class="caption font-weight-bold mt-2"
+              <div class="d-flex align-center justify-space-between my-2">
+                <div class="">{{ section.name }}</div>
+                <div class="d-flex align-center">
+                  <v-btn
+                    class="caption font-weight-bold"
+                    fab
+                    x-small
+                    text
                     @click="addTask(section)"
                   >
-                    <v-icon class="mr-1" small> mdi-plus </v-icon>
-                  </button>
+                    <v-icon class="" small> mdi-plus </v-icon>
+                  </v-btn>
                   <v-menu
                     :ref="`menu${sectionIndex}`"
                     :close-on-content-click="false"
@@ -101,9 +104,17 @@
                     :max-width="80"
                   >
                     <template #activator="{ on, attrs }">
-                      <v-icon class="mr-1" small v-bind="attrs" v-on="on">
-                        mdi-dots-horizontal
-                      </v-icon>
+                      <v-btn
+                        class="caption font-weight-bold"
+                        fab
+                        x-small
+                        text
+                        @click="addTask(section)"
+                      >
+                        <v-icon small v-bind="attrs" v-on="on">
+                          mdi-dots-horizontal
+                        </v-icon>
+                      </v-btn>
                     </template>
 
                     <v-card>
@@ -133,7 +144,7 @@
                       </v-list>
                     </v-card>
                   </v-menu>
-                </span>
+                </div>
               </div>
               <v-card
                 class="overflow-auto rounded-xl mb-2 card-section"
@@ -257,24 +268,30 @@
                       role="group"
                       aria-label="Basic example"
                     >
-                      <button
+                      <v-btn
                         class="caption font-weight-bold mt-2"
+                        small
+                        text
                         @click="addTask(section)"
                       >
                         <v-icon color="green" small>mdi-plus</v-icon>Add Task
-                      </button>
+                      </v-btn>
                     </div>
                   </draggable>
                 </v-card-text>
               </v-card>
             </div>
-            <button
-              v-if="sectionGroups?.length"
-              class="caption font-weight-bold mt-2 ml-4"
-              @click="createSectionDialog = true"
-            >
-              <v-icon color="green" small>mdi-plus</v-icon>Add Section
-            </button>
+            <div class="my-2">
+              <v-btn
+                v-if="sectionGroups?.length"
+                class="font-weight-bold"
+                small
+                text
+                @click="createSectionDialog = true"
+              >
+                <v-icon color="green" small>mdi-plus</v-icon>Add Section
+              </v-btn>
+            </div>
           </div>
         </v-sheet>
       </v-col>
@@ -287,12 +304,14 @@
             src="../assets/EmptyState.svg"
             alt="EmptyState"
           />
-          <button
+          <v-btn
             class="caption font-weight-bold"
+            small
+            text
             @click="createSectionDialog = true"
           >
             <v-icon color="green" small>mdi-plus</v-icon>Add Section
-          </button>
+          </v-btn>
         </div>
       </v-col>
     </v-row>
