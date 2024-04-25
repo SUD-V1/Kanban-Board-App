@@ -352,7 +352,7 @@
     <v-dialog v-model="updateTaskDialog" persistent max-width="290">
       <v-form ref="form" v-model="validSection" lazy-validation>
         <UpdateTaskPopup
-          :content-props="'Create'"
+          :content-props="'Update'"
           :valid-task-props="validTask"
           :task-props="task"
           :name-rules-props="nameRules"
