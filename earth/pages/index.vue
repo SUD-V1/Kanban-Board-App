@@ -29,8 +29,8 @@
             <v-icon color="white">mdi-apple</v-icon>
           </v-btn>
           <div class="d-flex flex-column">
-            <span class="subtitle-2">Apple</span>
-            <span class="caption"
+            <span class="poppins-regular font-weight-bold">Apple</span>
+            <span class="poppins-regular"
               >5 boards <v-icon class="mx-0 px-0">mdi-circle-small</v-icon> 24
               members</span
             >
@@ -45,7 +45,7 @@
           prepend-inner-icon="mdi-magnify"
           hide-details
           dense
-          class="mr-2 caption rounded-lg"
+          class="mr-2 poppins-regular rounded-lg"
         ></v-text-field>
         <v-btn
           :min-height="40"
@@ -83,15 +83,18 @@
               :key="section._id"
               class="mx-2"
             >
-              <div class="d-flex align-center justify-space-between py-2">
-                <span class="subtitle-2 ml-1">{{ section.name }}</span>
-                <span>
-                  <button
-                    class="caption font-weight-bold mt-2"
+              <div class="d-flex align-center justify-space-between my-2">
+                <div class="poppins-medium">{{ section.name }}</div>
+                <div class="d-flex align-center">
+                  <v-btn
+                    class="poppins-regular font-weight-bold mr-1"
+                    fab
+                    x-small
+                    text
                     @click="addTask(section)"
                   >
-                    <v-icon class="mr-1" small> mdi-plus </v-icon>
-                  </button>
+                    <v-icon class="" small> mdi-plus </v-icon>
+                  </v-btn>
                   <v-menu
                     :ref="`menu${sectionIndex}`"
                     :close-on-content-click="false"
@@ -101,9 +104,17 @@
                     :max-width="80"
                   >
                     <template #activator="{ on, attrs }">
-                      <v-icon class="mr-1" small v-bind="attrs" v-on="on">
-                        mdi-dots-horizontal
-                      </v-icon>
+                      <v-btn
+                        class="poppins-regular font-weight-bold"
+                        fab
+                        x-small
+                        text
+                        @click="addTask(section)"
+                      >
+                        <v-icon small v-bind="attrs" v-on="on">
+                          mdi-dots-horizontal
+                        </v-icon>
+                      </v-btn>
                     </template>
 
                     <v-card>
@@ -124,7 +135,7 @@
                                 "
                                 >{{ item.icon }}</v-icon
                               >
-                              <span class="caption black--text">
+                              <span class="poppins-regular black--text">
                                 {{ item.title }}</span
                               >
                             </v-list-item-title>
@@ -133,14 +144,11 @@
                       </v-list>
                     </v-card>
                   </v-menu>
-                </span>
+                </div>
               </div>
               <v-card
-                class="overflow-auto rounded-xl mb-2"
+                class="overflow-auto rounded-xl mb-2 card-section"
                 color="grey lighten-5"
-                :height="450"
-                :min-height="450"
-                :max-height="450"
                 :width="235"
                 :min-width="235"
                 :max-width="235"
@@ -165,7 +173,7 @@
                     >
                       <v-card class="rounded-xl" flat outlined>
                         <v-card-title class="pt-2 pb-2">
-                          <span class="subtitle-2"
+                          <span class="poppins-medium"
                             >{{ taskList?.name?.substring(0, 15)
                             }}{{
                               taskList?.name?.length > 15 ? '...' : ''
@@ -215,7 +223,7 @@
                                         "
                                         >{{ item.icon }}</v-icon
                                       >
-                                      <span class="caption blackColor--text">
+                                      <span class="poppins-regular blackColor--text">
                                         {{ item.title }}</span
                                       >
                                     </v-list-item-title>
@@ -234,7 +242,7 @@
                           class="d-flex align-center justify-space-between"
                         >
                           <div>
-                            <v-avatar color="grey" size="27" class="mx-2">
+                            <v-avatar color="grey" size="27" class="ml-2">
                               <img
                                 v-if="taskList?.assignee"
                                 :src="taskList.assignee"
@@ -242,11 +250,11 @@
                               />
                               <v-icon v-else color="white">mdi-account</v-icon>
                             </v-avatar>
-                            <span class="caption grey--text">{{
+                            <span class="poppins-regular grey--text">{{
                               taskList.date
                             }}</span>
                           </div>
-                          <v-chip class="caption" small color="grey lighten-4">
+                          <v-chip class="poppins-regular" small color="grey lighten-4">
                             {{ taskList.subtitle?.substring(0, 7)
                             }}{{ taskList?.subtitle?.length > 8 ? '...' : '' }}
                           </v-chip>
@@ -260,24 +268,30 @@
                       role="group"
                       aria-label="Basic example"
                     >
-                      <button
-                        class="caption font-weight-bold mt-2"
+                      <v-btn
+                        class="poppins-regular font-weight-medium mt-2"
+                        small
+                        text
                         @click="addTask(section)"
                       >
                         <v-icon color="green" small>mdi-plus</v-icon>Add Task
-                      </button>
+                      </v-btn>
                     </div>
                   </draggable>
                 </v-card-text>
               </v-card>
             </div>
-            <button
-              v-if="sectionGroups?.length"
-              class="caption font-weight-bold mt-2 ml-4"
-              @click="createSectionDialog = true"
-            >
-              <v-icon color="green" small>mdi-plus</v-icon>Add Section
-            </button>
+            <div class="my-2">
+              <v-btn
+                v-if="sectionGroups?.length"
+                class="font-weight-medium"
+                small
+                text
+                @click="createSectionDialog = true"
+              >
+                <v-icon color="green" small>mdi-plus</v-icon>Add Section
+              </v-btn>
+            </div>
           </div>
         </v-sheet>
       </v-col>
@@ -290,12 +304,14 @@
             src="../assets/EmptyState.svg"
             alt="EmptyState"
           />
-          <button
-            class="caption font-weight-bold"
+          <v-btn
+            class="poppins-regular font-weight-bold"
+            small
+            text
             @click="createSectionDialog = true"
           >
             <v-icon color="green" small>mdi-plus</v-icon>Add Section
-          </button>
+          </v-btn>
         </div>
       </v-col>
     </v-row>
@@ -806,5 +822,10 @@ div::-webkit-scrollbar {
 .empty-state-svg-icon {
   width: 30rem;
   height: 10rem;
+}
+.card-section {
+  height: 90vh;
+  min-height: 90vh;
+  max-height: 90vh;
 }
 </style>

@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="pb-0">
-      <span class="subtitle-2">{{ content }} Section</span>
+      <span class="poppins-medium">{{ content }} Section</span>
     </v-card-title>
     <v-card-text class="pr-2 mt-3 mb-0 pb-0">
       <v-text-field
@@ -10,7 +10,7 @@
         hide-details
         dense
         outlined
-        class="mr-2 caption rounded-lg mb-2"
+        class="mr-2 poppins-regular rounded-lg mb-2"
         :rules="nameRules"
       ></v-text-field>
     </v-card-text>

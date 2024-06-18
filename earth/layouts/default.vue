@@ -25,12 +25,12 @@
         hide-details
         solo
         dense
-        class="rounded-lg caption text-center"
+        class="rounded-lg poppins-regular text-center"
       >
         <template #label>
           <div class="d-flex align-center justify-center" style="width: 400px">
             <v-icon small class="mb-1 mx-2"> mdi-lock </v-icon>
-            <span class="caption">easykanban.com</span>
+            <span class="poppins-regular">easykanban.com</span>
           </div>
         </template>
       </v-text-field>
@@ -55,7 +55,7 @@
     </v-main>
     <v-footer app>
       <v-spacer />
-      <span class="caption"> Created Date : 23-04-2024</span>
+      <span class="poppins-regular"> Created Date : 23-04-2024</span>
     </v-footer>
   </v-app>
 </template>
@@ -69,6 +69,24 @@ export default {
 }
 </script>
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+* {
+  font-family: 'Poppins' !important;
+}
+html {
+  font-family: 'Poppins' !important;
+}
+div,span,
+p,
+a, input {
+  font-family: 'Poppins' !important;
+  font-size: 12px;
+}
+button{
+  font-family: 'Poppins' !important;
+  text-transform: capitalize !important;
+  font-size: 12px;
+}
 .v-input__icon.v-input__icon--append i {
   font-size: 20px;
 }

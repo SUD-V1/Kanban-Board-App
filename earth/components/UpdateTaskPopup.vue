@@ -1,7 +1,7 @@
 <template>
   <v-card>
     <v-card-title class="pb-0">
-      <span class="subtitle-2">{{ content }} Task</span>
+      <span class="poppins-medium">{{ content }} Task</span>
     </v-card-title>
     <v-card-text class="pr-2 mt-3 mb-0 pb-0">
       <v-text-field
@@ -10,7 +10,7 @@
         hide-details
         dense
         outlined
-        class="mr-2 caption rounded-lg mb-2"
+        class="mr-2 poppins-regular rounded-lg mb-2"
         :rules="nameRules"
       ></v-text-field>
       <v-text-field
@@ -19,7 +19,7 @@
         hide-details
         dense
         outlined
-        class="mr-2 caption rounded-lg mb-2"
+        class="mr-2 poppins-regular rounded-lg mb-2"
         :rules="nameRules"
       ></v-text-field>
       <v-textarea
@@ -29,7 +29,7 @@
         outlined
         rows="3"
         placeholder="Description"
-        class="mr-2 caption rounded-lg my-2"
+        class="mr-2 poppins-regular rounded-lg my-2"
         :rules="nameRules"
       ></v-textarea>
       <v-autocomplete
@@ -41,13 +41,13 @@
         outlined
         dense
         hide-details
-        class="mr-2 caption rounded-lg mb-2"
+        class="mr-2 poppins-regular rounded-lg mb-2"
       >
         <template v-slot:selection="data">
           <v-avatar left size="27">
             <v-img :src="data.item.avatar"></v-img>
           </v-avatar>
-          <span class="caption">{{ data.item.name }}</span>
+          <span class="poppins-regular">{{ data.item.name }}</span>
         </template>
         <template v-slot:item="data">
           <template>
@@ -55,10 +55,10 @@
               <img :src="data.item.avatar" />
             </v-list-item-avatar>
             <v-list-item-content>
-              <v-list-item-title class="caption">{{
+              <v-list-item-title class="poppins-regular">{{
                 data.item.name
               }}</v-list-item-title>
-              <v-list-item-subtitle class="caption">{{
+              <v-list-item-subtitle class="poppins-regular">{{
                 data.item.group
               }}</v-list-item-subtitle>
             </v-list-item-content>
@@ -84,7 +84,7 @@
             readonly
             v-bind="attrs"
             v-on="on"
-            class="mr-2 caption rounded-lg my-2"
+            class="mr-2 poppins-regular rounded-lg my-2"
           ></v-text-field>
         </template>
         <v-date-picker v-model="task.date" @input="menu = false"></v-date-picker>

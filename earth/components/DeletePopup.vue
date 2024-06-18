@@ -1,15 +1,18 @@
 <template>
   <v-card>
     <v-card-title class="pb-0">
-      <span class="subtitle-2">Delete {{ content }}</span>
+      <span class="poppins-medium">Delete {{ content }}</span>
     </v-card-title>
-    <v-card-title>
-      <span class="caption text-center"
-        ><v-icon color="yellow darken-2" class="mr-2"
-          >mdi-alert-circle-outline</v-icon
-        >Are you sure you want to delete this
+    <v-card-title class="py-0">
+      <div class="d-flex align-start">
+      <v-icon color="yellow darken-2" class="mr-2 mt-1"
+        >mdi-alert-circle-outline</v-icon
+      >
+      <span class="poppins-regular text-center"
+        >Are you sure you want to delete <br>
         <b class="black--text">{{ content }}?</b></span
       >
+    </div>
     </v-card-title>
 
     <v-card-actions class="grey lighten-4 my-0">
