@@ -1,0 +1,4 @@
+[build]
+  base = "frontend"
+  publish = "earth/public"
+  command = "npm run build"
